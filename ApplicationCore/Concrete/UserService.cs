@@ -42,26 +42,26 @@ namespace ApplicationCore.Concrete
 
         public async Task<DeleteUserDtos> DeleteUser(Guid id)
         {
-
-            var result = await _baseservice.DeleteAsync(id);
-            return _automapper.Map<DeleteUserDtos>(result);
+            var entity=await  _readRepository.GetByIdAsync(id);
+            if (entity != null)
+            {
+                var result = await _baseservice.DeleteAsync(id);
+                return _automapper.Map<DeleteUserDtos>(result);
+            }
+           return _automapper.Map<DeleteUserDtos>(entity);
         }
 
         public async Task<List<GetAllUserDto>> GetAllUser()
         {
             var result = await _baseservice.GetAllAsync();
             var users=new List<GetAllUserDto>();
-            if (result != null)
-            {
+
                 foreach(var user in result)
                 {
                     var dto=_automapper.Map<GetAllUserDto>(user);
                     users.Add(dto);
                 }
                 return users;
-            }
-            throw new ArgumentNullException("Result boş döndü");
-
         }
 
         public async Task<GetByIdUserDto> GetByIdUser(Expression<Func<AppUser, bool>> filtre, params Expression<Func<AppUser, object>>[] includes)
@@ -75,7 +75,7 @@ namespace ApplicationCore.Concrete
                 dto.roles = string.Join(",", role);         
                 return dto;
             }
-            throw new ArgumentNullException("Bu Id de kayıt yok");
+            return _automapper.Map<GetByIdUserDto>(entity);
         }
 
         public async Task<LoginResponseModels> Login(LoginUserDto model)
@@ -117,26 +117,31 @@ namespace ApplicationCore.Concrete
 
         public async Task<CreateUserDto> Register(CreateUserDto model,Expression<Func<AppUser,bool>>?method=null)
         {
-            var entity = _automapper.Map<AppUser>(model);
-            var result =  await _baseservice.AddAsync( entity, model.Password, method);
-            var user =_automapper.Map<AppUser>(result);
-            if (user != null)
+            var user = await _readRepository.GetSingleAsync(method);
+            if (user == null)
             {
-                await _userManager.AddToRoleAsync(user, "user");
-            }
+                var entity = _automapper.Map<AppUser>(model);
+                var result = await _baseservice.AddAsync(entity, model.Password,method);
+                if (result != null)
+                {
+                    await _userManager.AddToRoleAsync(result, "user");
+                }
 
+                return _automapper.Map<CreateUserDto>(result);
+            }
             return _automapper.Map<CreateUserDto>(user);
+            
         }
         public async Task<UpdateUserDto> UpdateUser(UpdateUserDto model, Expression<Func<AppUser, bool>> method, Expression<Func<AppUser, object>>[] includes)
         {
             var entity = await _readRepository.GetSingleAsync(method);
-            var map=_automapper.Map(model,entity);
-            var result = await _baseservice.UpdateAsync(map, method, includes);
-            if (result != null) 
-            { 
+            if (entity != null)
+            {
+                var map = _automapper.Map(model, entity);
+                var result = await _baseservice.UpdateAsync(map, method, includes);
                 return _automapper.Map<UpdateUserDto>(result);
             }
-            throw new ArgumentNullException();
+            return _automapper.Map<UpdateUserDto>(entity);
         }
 
         

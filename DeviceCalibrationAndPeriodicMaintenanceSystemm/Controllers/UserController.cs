@@ -39,49 +39,77 @@ namespace DeviceCalibrationAndPeriodicMaintenanceSystemm.Controllers
             Expression<Func<AppUser,bool>> method=x=>x.Email==model.Email;
             _logger.LogInformation("İşlem başladı");
             var result = await _userService.Register(model,method);
-            
-            _apiresponse.IsSuccess = true;
-            _apiresponse.HttpStatusCode= HttpStatusCode.OK;
-            _apiresponse.Result= result;
+            if (result != null)
+            {
+                _apiresponse.IsSuccess = true;
+                _apiresponse.HttpStatusCode = HttpStatusCode.OK;
+                _apiresponse.Result = result;
+                return _apiresponse;
+            }
+            _apiresponse.IsSuccess= false;
+            _apiresponse.ErrorMessages.Add("Entity bulunamadı");
+            _apiresponse.HttpStatusCode = HttpStatusCode.NotFound;
             return _apiresponse;
 
         }
         [HttpPut("update-user")]
-        public async Task<ApiResponse<UpdateUserDto>> Update(string email,UpdateUserDto model)
+        public async Task<ApiResponse<UpdateUserDto>> Update(UpdateUserDto model)
         {
             var _apiResponse=new ApiResponse<UpdateUserDto>();
-            Expression<Func<AppUser,bool>> method=x=>x.Email==email;
+            Expression<Func<AppUser,bool>> method=x=>x.Id==model.Id;
             _logger.LogInformation("Update işlemi başladı");
-            var result=await _userService.UpdateUser(model,method);
+            var result = await _userService.UpdateUser(model, method);
+            if(result != null) 
 
-            _apiResponse.IsSuccess=true;
-            _apiResponse.HttpStatusCode= HttpStatusCode.OK;
-            _apiResponse.Result= result;
+            {
+                    _apiResponse.IsSuccess = true;
+                    _apiResponse.HttpStatusCode = HttpStatusCode.OK;
+                    _apiResponse.Result = result;
+                    return _apiResponse;
+            }
+            _apiResponse.IsSuccess= false;
+            _apiResponse.ErrorMessages.Add("Böyle bir  entity yok");
+            _apiResponse.HttpStatusCode= HttpStatusCode.NotFound;
             return _apiResponse;
-        }
+
+            }
         [HttpDelete("delete-user")]
         public async Task<ApiResponse<DeleteUserDtos>> Delete(Guid id)
         {
             var _apiResponse = new ApiResponse<DeleteUserDtos>();
             _logger.LogInformation("Delete işlemi başladı");
             var result=await _userService.DeleteUser(id);
-
-            _apiResponse.IsSuccess= true;
-            _apiResponse.HttpStatusCode= HttpStatusCode.OK;
-            _apiResponse.Result= result;
+            if (result != null)
+            {
+                _apiResponse.IsSuccess = true;
+                _apiResponse.HttpStatusCode = HttpStatusCode.OK;
+                _apiResponse.Result = result;
+                return _apiResponse;
+            }
+            _apiResponse.IsSuccess= false;
+            _apiResponse.ErrorMessages.Add("Entity bulunamadı");
+            _apiResponse.HttpStatusCode=HttpStatusCode.NotFound;
             return _apiResponse;
         }
-        [Authorize(Policy= "Admin rolü ara")]
+       // [Authorize(Policy= "Admin rolü ara")]
         [HttpGet("getall-user")]
         public async Task<ApiResponse<GetAllUserDto>> GetAll()
         {
             var _apiResponse=new ApiResponse<GetAllUserDto>();
             _logger.LogInformation("GetAll işlemi başlatıldı");
             var result = await _userService.GetAllUser();
-            _apiResponse.IsSuccess= true;
-            _apiResponse.HttpStatusCode = HttpStatusCode.OK;
-            _apiResponse.Result= result;
+            if (result!=null)
+            {
+                _apiResponse.IsSuccess = true;
+                _apiResponse.HttpStatusCode = HttpStatusCode.OK;
+                _apiResponse.Result = result;
+                return _apiResponse;
+            }
+            _apiResponse.IsSuccess= false;
+            _apiResponse.ErrorMessages.Add("Herhangi bir users girilmemiş");
+            _apiResponse.HttpStatusCode=HttpStatusCode.NotFound;
             return _apiResponse;
+            
         }
         [HttpGet("getbyid-user")]
         public async Task<ApiResponse<GetByIdUserDto>> GetById(Guid id)
@@ -96,7 +124,10 @@ namespace DeviceCalibrationAndPeriodicMaintenanceSystemm.Controllers
                 _apiResponse.Result= result;
                 return _apiResponse;
             }
-            throw new ArgumentNullException("Sonuç dönmüyor");
+            _apiResponse.IsSuccess=false;
+            _apiResponse.ErrorMessages.Add("Bu idye sahip kullanıcı yok");
+            _apiResponse.HttpStatusCode=HttpStatusCode.NotFound;
+            return _apiResponse;
 
         }
     }

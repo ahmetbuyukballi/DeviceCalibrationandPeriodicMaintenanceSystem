@@ -11,11 +11,11 @@ namespace ApplicationCore.Abstraction
 {
     public interface IMeintenancePlanService
     {
-        public Task<CreateMeintenancePlanDto> CreatePlan(CreateMeintenancePlanDto models,Expression<Func<MeintenancePlan,bool>> filtre,params Expression<Func<MeintenancePlan, object>>[] include);
-        public Task<UpdateMeintenancePlanDto> UpdatePlan(UpdateMeintenancePlanDto models, Expression<Func<MeintenancePlan, bool>> filtre, params Expression<Func<MeintenancePlan, object>>[] includes);
+        public Task<CreateMeintenancePlanDto> CreatePlan(CreateMeintenancePlanDto models, Expression<Func<MeintenancePlan, bool>>? filtre = null, params Expression<Func<MeintenancePlan, object>>[] include);
+        public Task<UpdateMeintenancePlanDto> UpdatePlan(UpdateMeintenancePlanDto models,Guid id, params Expression<Func<MeintenancePlan, object>>[] includes);
         public Task<DeleteMeintenancePlanDto> DeletePlan(Guid id);
-        public Task<List<GetMeintenancePlanDtos>> GetAllPlan(Expression<Func<MeintenancePlan, bool>> filtre, params Expression<Func<MeintenancePlan, object>>[] includes);
-        public Task<GetMeintenancePlanDtos> GetIdPlan(Expression<Func<MeintenancePlan, bool>> filtre, params Expression<Func<MeintenancePlan, object>>[] includes);
+        public Task<List<GetMeintenancePlanDtos>> GetAllPlan();
+        public Task<GetMeintenancePlanDtos> GetIdPlan(Guid id, params Expression<Func<MeintenancePlan, object>>[] includes);
 
     }
 }

@@ -23,8 +23,8 @@ namespace ApplicationCore.Concrete
             _mapper = mapper;
             _readRepository = readRepository;
         }
-        public async Task<CreateMeintenancePlanDto> CreatePlan(CreateMeintenancePlanDto model, Expression<Func<MeintenancePlan, bool>> filtre, params Expression<Func<MeintenancePlan, object>>[] include)
-        {
+        public async Task<CreateMeintenancePlanDto> CreatePlan(CreateMeintenancePlanDto model,Expression<Func<MeintenancePlan,bool>>?filtre=null,params Expression<Func<MeintenancePlan, object>>[] include)
+        { 
             var entity=_mapper.Map<MeintenancePlan>(model);
             var result=await _baseService.AddAsync(entity,null,filtre);
             return _mapper.Map<CreateMeintenancePlanDto>(result);
@@ -33,13 +33,18 @@ namespace ApplicationCore.Concrete
 
         public async Task<DeleteMeintenancePlanDto> DeletePlan(Guid id)
         {
-            var result=await _baseService.DeleteAsync(id);
-            return _mapper.Map<DeleteMeintenancePlanDto>(result);
+            var entity = await _readRepository.GetByIdAsync(id);
+            if (entity!= null)
+            {
+                var result = await _baseService.DeleteAsync(id);
+                return _mapper.Map<DeleteMeintenancePlanDto>(result);
+            }
+            return null;
         }
 
-        public async Task<List<GetMeintenancePlanDtos>> GetAllPlan(Expression<Func<MeintenancePlan, bool>> filtre, params Expression<Func<MeintenancePlan, object>>[] includes)
+        public async Task<List<GetMeintenancePlanDtos>> GetAllPlan()
         {
-           var result=await _baseService.GetAllAsync(filtre, includes);
+           var result=await _baseService.GetAllAsync();
             var model=new List<GetMeintenancePlanDtos>();
             foreach(var entity in result)
             {
@@ -49,20 +54,24 @@ namespace ApplicationCore.Concrete
             return model;
         }
 
-        public async Task<GetMeintenancePlanDtos> GetIdPlan(Expression<Func<MeintenancePlan, bool>> filtre, params Expression<Func<MeintenancePlan, object>>[] includes)
+        public async Task<GetMeintenancePlanDtos> GetIdPlan(Guid id,params Expression<Func<MeintenancePlan, object>>[] includes)
         {
+            Expression<Func<MeintenancePlan, bool>> filtre = x => x.Id == id;
+            if (filtre == null)
+            {
+                return null;
+            }
             var result=await _baseService.GetByIdAsync(filtre, includes);
             return _mapper.Map<GetMeintenancePlanDtos>(result);
         }
 
-        public async Task<UpdateMeintenancePlanDto> UpdatePlan(UpdateMeintenancePlanDto models, Expression<Func<MeintenancePlan, bool>> filtre, params Expression<Func<MeintenancePlan, object>>[] includes)
+        public async Task<UpdateMeintenancePlanDto> UpdatePlan(UpdateMeintenancePlanDto models,Guid id, params Expression<Func<MeintenancePlan, object>>[] includes)
         {
+            Expression<Func<MeintenancePlan,bool>> filtre=x=>x.Id==id;
             var entity=await _readRepository.GetSingleAsync(filtre);
-            if (entity == null)
-            {
-                throw new ArgumentNullException("Böyle bir entity yok");
-            }
-            var result=await _baseService.UpdateAsync(entity,filtre, includes);
+            if (entity == null) return null;
+            var model=_mapper.Map(models,entity);
+            var result=await _baseService.UpdateAsync(model,filtre, includes);
             return _mapper.Map<UpdateMeintenancePlanDto>(result);
         }
     }

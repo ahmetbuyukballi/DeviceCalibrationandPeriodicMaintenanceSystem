@@ -43,40 +43,26 @@ namespace ApplicationCore.BaseService
 
         public async Task<TModel> AddAsync(TModel model ,string? password, Expression<Func<TModel,bool>>?method=null,params Expression<Func<TModel, object>>[] references)
         {
-            
-            if (model != null)
-            {
-                var existing = await _readRepository.GetSingleAsync(method);
-                if (existing != null)
-                {
-                    throw new Exception("Zaten kayıtlı bir veri var.");
-                }
-                await LoadReference(method, references);
-                await _writeRepository.AddAsync(model);
-                if (await _writeRepository.SaveAsync() > 0)
-                {
-                    return model;
-                }
-            }
             if (model.GetType() == typeof(AppUser))
             {
-                var user = await _userManager.CreateAsync((AppUser)(object)model,password);
+                var user = await _userManager.CreateAsync((AppUser)(object)model, password);
                 return model;
             }
-            throw new ArgumentNullException("Veri girilmemiştir");
+
+            await LoadReference(method, references);
+            await _writeRepository.AddAsync(model);
+            await _writeRepository.SaveAsync();
+            return model;
+
             
         }
 
         public async Task<TModel> DeleteAsync(Guid id)
         {
-            var entity = await _readRepository.GetByIdAsync(id);
-            if(entity != null)
-            {
+                var entity = await _readRepository.GetByIdAsync(id);
                 await _writeRepository.DeleteByIdAsync(id);
                 await _writeRepository.SaveAsync();
                 return entity;
-            }
-            throw new ArgumentNullException("Entity yok");
         }
 
         public async Task<List<TModel>> GetAllAsync(Expression<Func<TModel, bool>>? filter = null, params Expression<Func<TModel, object>>[] includes)
@@ -86,10 +72,7 @@ namespace ApplicationCore.BaseService
             if (filter != null)
             {
                 query=query.Where(filter);
-                if (query.Count() < 1) 
-                {
-                    throw new ArgumentNullException("Bu şartları sağlayan herhangi bir veri bulunamadı");
-                }
+               
             }
             var list=await query.ToListAsync();
             return _autpMapper.Map<List<TModel>>(list);
@@ -99,13 +82,8 @@ namespace ApplicationCore.BaseService
         {
             IQueryable<TModel> query = _readRepository.GetAll();
             query=ApplyIncludes(query, includes);
-
-            if (filter != null)
-            {
-                var entity =  await query.FirstOrDefaultAsync(filter);
-                return entity;
-            }
-            return null;
+            var entity =  await query.FirstOrDefaultAsync(filter);
+            return entity;
         }
 
         public async Task<TModel?> UpdateAsync(TModel model, Expression<Func<TModel, bool>> filter,Expression<Func<TModel, object>>[] references)
@@ -113,11 +91,9 @@ namespace ApplicationCore.BaseService
             if (model == null) return null;
             await LoadReference(filter, references);
             await _writeRepository.UpdateAsync(model);
-            if(await _writeRepository.SaveAsync() > 0)
-            {
-                return model;
-            }
-            throw new ArgumentNullException("Ekleme işleminde bir hata oldu");
+            await _writeRepository.SaveAsync();
+            return model;
+
         }
 
         private async Task LoadReference(Expression<Func<TModel,bool>> method, params Expression<Func<TModel, object>>[] references)
