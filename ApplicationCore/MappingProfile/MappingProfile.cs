@@ -1,4 +1,5 @@
 ﻿using ApplicationCore.Dto.DevicesDto;
+using ApplicationCore.Dto.MeintenancePlanDtos;
 using ApplicationCore.Dto.UserDto;
 using AutoMapper;
 using Domain.Entites;
@@ -18,6 +19,7 @@ namespace ApplicationCore.MappingProfile
         {
             // Kullanıcı mappingleri
             CreateMap<AppUser, CreateUserDto>();
+            CreateMap<CreateUserDto, AppUser>();
             CreateMap<UpdateUserDto, AppUser>()
                 .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => true));
             CreateMap<AppUser, UpdateUserDto>();
@@ -43,8 +45,15 @@ namespace ApplicationCore.MappingProfile
             CreateMap<Devices, GetDeviceDto>();
 
             //Bakım planları mappingler
-            CreateMap<CreateDeviceDto, Devices>();
-            CreateMap<Devices,CreateDeviceDto>();
+            CreateMap<CreateMeintenancePlanDto, MeintenancePlan>();
+            CreateMap<MeintenancePlan,CreateMeintenancePlanDto>();
+            CreateMap<GetMeintenancePlanDtos, MeintenancePlan>();
+            CreateMap<MeintenancePlan,GetMeintenancePlanDtos>();
+            CreateMap<MeintenancePlan, DeleteMeintenancePlanDto>();
+            CreateMap<GetMeintenancePlanDtos, MeintenancePlan>();
+            CreateMap<MeintenancePlan, GetMeintenancePlanDtos>();
+            CreateMap<UpdateMeintenancePlanDto,MeintenancePlan>();
+            CreateMap<MeintenancePlan, UpdateMeintenancePlanDto>();
         }
     }
 

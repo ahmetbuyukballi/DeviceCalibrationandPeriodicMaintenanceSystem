@@ -52,11 +52,11 @@ builder.Services.Configure<RouteOptions>(options => {
     options.LowercaseUrls = true;
     options.LowercaseQueryStrings = true;
 });
-builder.Services.AddAuthorization(options =>
+/*builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("Admin rolü ara",
     policy => policy.RequireRole("admin"));
-});
+});*/
 var app = builder.Build();
 
 // Veritabaný seed iþlemi
@@ -79,7 +79,7 @@ if (app.Environment.IsDevelopment())
 app.UseMiddleware<ExpectionMiddleware>(); // kendi middleware'in
 app.UseHttpsRedirection();
 app.UseAuthentication();
-app.UseAuthorization();
+//app.UseAuthorization();
 app.MapControllers();
 
 try
