@@ -16,8 +16,8 @@ namespace ApplicationCore.Abstraction
                                         params Expression<Func<TModel, object>>[] includes);
         Task<TModel> GetByIdAsync(Expression<Func<TModel, bool>> filter,
                                         params Expression<Func<TModel, object>>[] includes);
-        Task<TModel> AddAsync( TModel model,string? password, Expression<Func<TModel, bool>> method, params Expression<Func<TModel, object>>[] references);
-        Task<TModel?> UpdateAsync(TModel model,Expression<Func<TModel, bool>> filter,
+        Task<TModel> AddAsync<TDto>(TDto model,string? password, Expression<Func<TModel, bool>> method, params Expression<Func<TModel, object>>[] references);
+        Task<TModel?> UpdateAsync<TDto>(TDto model,Expression<Func<TModel, bool>> filter,
                                  Expression<Func<TModel, object>>[] references);
         Task<TModel> DeleteAsync(Guid id);
 

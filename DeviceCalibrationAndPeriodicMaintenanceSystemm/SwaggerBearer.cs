@@ -24,7 +24,8 @@ namespace DeviceCalibrationAndPeriodicMaintenanceSystemm
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(key)),
                     ValidateIssuer = false,
-                    ValidateAudience = false
+                    ValidateAudience = false,
+                    LifetimeValidator=(notBefore,expires,securityToken, validationParameters)=>expires!=null?expires>DateTime.UtcNow:false
                 };
             });
 

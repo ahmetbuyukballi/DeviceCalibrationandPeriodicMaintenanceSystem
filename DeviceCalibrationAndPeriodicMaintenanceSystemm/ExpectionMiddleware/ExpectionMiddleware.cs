@@ -31,6 +31,19 @@ namespace DeviceCalibrationAndPeriodicMaintenanceSystemm.ExpectionMiddleware
         {
             httpContext.Response.ContentType = "application/json";
             httpContext.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+            switch (ex)
+            {
+                case DirectoryNotFoundException:
+                    httpContext.Response.StatusCode = (int)HttpStatusCode.NotFound;
+                    break;
+                case InvalidOperationException:
+                    httpContext.Response.StatusCode = (int)HttpStatusCode.Conflict;
+                    break;
+                case ArgumentNullException:
+                    httpContext.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    break;
+                    // Gerekirse özel exception'lar eklenebilir
+            }
 
             var now = DateTime.UtcNow;
             Log.Error($"{now.ToString("HH:mm:ss")}:{ex}");

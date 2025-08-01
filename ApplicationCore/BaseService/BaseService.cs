@@ -2,6 +2,7 @@
 using ApplicationCore.Dto.UserDto;
 using AutoMapper;
 using Domain;
+using Domain.Entites;
 using Domain.Identity;
 using Domain.Repository;
 using Microsoft.AspNetCore.Http;
@@ -20,7 +21,7 @@ using System.Threading.Tasks;
 
 namespace ApplicationCore.BaseService
 {
-    public class BaseService<TModel> : IBaseService<TModel>
+    public abstract class BaseService<TModel> :IBaseService<TModel>
         where TModel : class
     {
         private readonly IWriteRepository<TModel> _writeRepository;
@@ -40,60 +41,85 @@ namespace ApplicationCore.BaseService
             _httpcontextAccessor = httpContextAccessor;
         }
 
+   
 
-        public async Task<TModel> AddAsync(TModel model ,string? password, Expression<Func<TModel,bool>>?method=null,params Expression<Func<TModel, object>>[] references)
+        public virtual async Task<TModel> AddAsync<TDto>(TDto model ,string? password, Expression<Func<TModel,bool>>?method=null,params Expression<Func<TModel, object>>?[] references)
         {
-            if (model.GetType() == typeof(AppUser))
+           var entity= _autpMapper.Map<TModel>(model);
+            if (entity.GetType() == typeof(AppUser))
             {
-                var user = await _userManager.CreateAsync((AppUser)(object)model, password);
-                return model;
+                var user = await _userManager.CreateAsync((AppUser)(object)entity,password);
+                return entity;
+            }
+            if (method != null || references != null) 
+            {
+                await LoadReference(method, references);
             }
 
-            await LoadReference(method, references);
-            await _writeRepository.AddAsync(model);
-            await _writeRepository.SaveAsync();
-            return model;
+          if(await _readRepository.GetSingleAsync(method)==null)
+            {
+                var user=await _writeRepository.AddAsync(entity);
+                await _writeRepository.SaveAsync();
+                return entity;
+            }
 
+            throw new InvalidOperationException("Bu veri veritabanında mevcut");
             
         }
 
-        public async Task<TModel> DeleteAsync(Guid id)
+        public virtual async Task<TModel> DeleteAsync(Guid id)
         {
-                var entity = await _readRepository.GetByIdAsync(id);
+             var entity = await _readRepository.GetByIdAsync(id);
+            if (entity != null)
+            {
                 await _writeRepository.DeleteByIdAsync(id);
                 await _writeRepository.SaveAsync();
                 return entity;
-        }
-
-        public async Task<List<TModel>> GetAllAsync(Expression<Func<TModel, bool>>? filter = null, params Expression<Func<TModel, object>>[] includes)
-        {
-            IQueryable<TModel> query = _readRepository.GetAll();    
-            query=ApplyIncludes(query, includes);
-            if (filter != null)
-            {
-                query=query.Where(filter);
-               
             }
-            var list=await query.ToListAsync();
-            return _autpMapper.Map<List<TModel>>(list);
+            throw new DirectoryNotFoundException("Bu veri elimizde yok");
         }
 
-        public async Task<TModel> GetByIdAsync(Expression<Func<TModel, bool>> filter, params Expression<Func<TModel, object>>[] includes)
+        public virtual async Task<List<TModel>> GetAllAsync(Expression<Func<TModel, bool>>? filter = null, params Expression<Func<TModel, object>>[] includes)
+        {
+            IQueryable<TModel> query = _readRepository.GetAll();
+            if (query!=null)
+            {
+                query = ApplyIncludes(query, includes);
+                if (filter != null)
+                {
+                    query = query.Where(filter);
+
+                }
+                var list = await query.ToListAsync();
+                return _autpMapper.Map<List<TModel>>(list);
+            }
+            throw new DirectoryNotFoundException("Bu veri elimizde yok");
+        }
+
+        public virtual async Task<TModel> GetByIdAsync(Expression<Func<TModel, bool>> filter, params Expression<Func<TModel, object>>[] includes)
         {
             IQueryable<TModel> query = _readRepository.GetAll();
             query=ApplyIncludes(query, includes);
             var entity =  await query.FirstOrDefaultAsync(filter);
-            return entity;
+            if (entity != null)
+            {
+                return entity;
+            }
+            throw new DirectoryNotFoundException("Bu veri elimizde yok");
         }
 
-        public async Task<TModel?> UpdateAsync(TModel model, Expression<Func<TModel, bool>> filter,Expression<Func<TModel, object>>[] references)
+        public virtual async Task<TModel?> UpdateAsync<TDto>(TDto model, Expression<Func<TModel, bool>> filter,Expression<Func<TModel, object>>[] references)
         {
-            if (model == null) return null;
-            await LoadReference(filter, references);
-            await _writeRepository.UpdateAsync(model);
-            await _writeRepository.SaveAsync();
-            return model;
-
+            var entity = await _readRepository.GetSingleAsync(filter);
+            if (entity!=null)
+            {
+                var result=_autpMapper.Map(model, entity);
+                await LoadReference(filter, references);
+                await _writeRepository.UpdateAsync(result);
+                await _writeRepository.SaveAsync();
+                return result;
+            }
+            throw new DirectoryNotFoundException("Bu veri elimizde yok");
         }
 
         private async Task LoadReference(Expression<Func<TModel,bool>> method, params Expression<Func<TModel, object>>[] references)
@@ -137,6 +163,11 @@ namespace ApplicationCore.BaseService
             }
 
             throw new InvalidOperationException();
+        }
+        protected Guid GetUserId()
+        {
+            var IdStr = _httpcontextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier);
+            return Guid.TryParse(IdStr, out var id) ? id : Guid.Empty;
         }
     }
 

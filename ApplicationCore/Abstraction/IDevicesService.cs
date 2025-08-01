@@ -13,7 +13,7 @@ namespace ApplicationCore.Abstraction
 {
     public interface IDevicesService
     {
-        public Task<CreateDeviceDto> CreateDevice(CreateDeviceDto model,params Expression<Func<Devices, object>>[] includes);
+        public Task<CreateDeviceDto> CreateDevice(CreateDeviceDto model);
         public Task<UpdateDeviceDto> UpdateDevice(UpdateDeviceDto device,Guid id,params Expression<Func<Devices,object>>[] includes);
         public Task<DeleteDeviceDtos> DeleteDevice(Guid id);
         public Task<List<GetDeviceDto>> GetAllDevice();

@@ -1,5 +1,8 @@
 ﻿using ApplicationCore.Dto.DevicesDto;
+using ApplicationCore.Dto.FeedBackDtos;
 using ApplicationCore.Dto.MeintenancePlanDtos;
+using ApplicationCore.Dto.MeintenanceRecordsDtos;
+using ApplicationCore.Dto.NotificationLogDto;
 using ApplicationCore.Dto.UserDto;
 using AutoMapper;
 using Domain.Entites;
@@ -19,7 +22,8 @@ namespace ApplicationCore.MappingProfile
         {
             // Kullanıcı mappingleri
             CreateMap<AppUser, CreateUserDto>();
-            CreateMap<CreateUserDto, AppUser>();
+            CreateMap<CreateUserDto, AppUser>().ForMember(opt=>opt.LastModifiedBy,
+                x=>x.MapFrom(src=>"System"));
             CreateMap<UpdateUserDto, AppUser>()
                 .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => true));
             CreateMap<AppUser, UpdateUserDto>();
@@ -54,6 +58,20 @@ namespace ApplicationCore.MappingProfile
             CreateMap<MeintenancePlan, GetMeintenancePlanDtos>();
             CreateMap<UpdateMeintenancePlanDto,MeintenancePlan>();
             CreateMap<MeintenancePlan, UpdateMeintenancePlanDto>();
+            //Bakım kayıtları mappingleri
+            CreateMap<CreateRecordsDtos, MeintenanceRecord>();
+            CreateMap<MeintenanceRecord,CreateRecordsDtos>();
+            CreateMap<UpdateRecordsDtos,MeintenanceRecord>();
+            CreateMap<MeintenanceRecord, UpdateRecordsDtos>();
+            CreateMap<MeintenanceRecord, DeleteRecordsDtos>();
+            CreateMap<MeintenanceRecord, GetRecordsDtos>();
+            //Bildirim işlemler
+            CreateMap<CreateNotificationLogDtos, NotificationLog>();
+            //FeedBack mappingleri
+            CreateMap<CreateFeedBackDto, FeedBack>();
+            CreateMap<FeedBack,UpdateFeedBackDto>();
+            CreateMap<FeedBack, DeleteFeedBackDto>();
+            CreateMap<FeedBack, GetFeedBackDto>();
         }
     }
 

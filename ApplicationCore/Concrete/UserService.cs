@@ -1,10 +1,13 @@
 ﻿using ApplicationCore.Abstraction;
+using ApplicationCore.BaseService;
+using ApplicationCore.Dto.Token;
 using ApplicationCore.Dto.UserDto;
 using ApplicationCore.Responses;
 using AutoMapper;
 using Domain;
 using Domain.Identity;
 using Domain.Repository;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -17,22 +20,29 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
 using System.Security.Claims;
+using System.Security.Cryptography.Xml;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace ApplicationCore.Concrete
 {
-    public class UserService:IUserService
+    public class UserService:BaseService<AppUser>,IUserService
     {
-        private readonly IBaseService<AppUser> _baseservice;
+        
         private readonly IReadRepository<AppUser> _readRepository;
         private readonly IReadRepository<AppRole> _roleReadRepository;
         private readonly UserManager<AppUser> _userManager;
         private readonly string secretKey;
         private readonly IMapper _automapper;
-        public UserService(IBaseService<AppUser> baseservice,IReadRepository<AppUser> readRepository,UserManager<AppUser> userManager,IConfiguration configuration,IMapper mapper,IReadRepository<AppRole> readRepository1)
+        public UserService(IWriteRepository<AppUser>writeRepository,
+            IRepository<AppUser> repository,
+            IReadRepository<AppUser> readRepository,
+            IMapper mapper,
+            UserManager<AppUser> userManager,
+            IHttpContextAccessor httpContextAccessor,
+            IConfiguration configuration,
+            IReadRepository<AppRole> readRepository1):base(writeRepository, mapper, repository,readRepository,userManager,httpContextAccessor)
         {
-            _baseservice = baseservice;
             _readRepository = readRepository;
             _userManager = userManager;
             secretKey = configuration.GetValue<string>("SecretKey:jwtKey");
@@ -42,18 +52,13 @@ namespace ApplicationCore.Concrete
 
         public async Task<DeleteUserDtos> DeleteUser(Guid id)
         {
-            var entity=await  _readRepository.GetByIdAsync(id);
-            if (entity != null)
-            {
-                var result = await _baseservice.DeleteAsync(id);
-                return _automapper.Map<DeleteUserDtos>(result);
-            }
-           return _automapper.Map<DeleteUserDtos>(entity);
+            var result = await DeleteAsync(id);
+           return _automapper.Map<DeleteUserDtos>(result);
         }
 
         public async Task<List<GetAllUserDto>> GetAllUser()
         {
-            var result = await _baseservice.GetAllAsync();
+            var result = await GetAllAsync();
             var users=new List<GetAllUserDto>();
 
                 foreach(var user in result)
@@ -67,14 +72,7 @@ namespace ApplicationCore.Concrete
         public async Task<GetByIdUserDto> GetByIdUser(Expression<Func<AppUser, bool>> filtre, params Expression<Func<AppUser, object>>[] includes)
         {
 
-            var entity =  await _baseservice.GetByIdAsync(filtre);  
-            if (entity != null) 
-            { 
-                var dto= _automapper.Map<GetByIdUserDto>(entity);
-                var role= await _userManager.GetRolesAsync(entity);
-                dto.roles = string.Join(",", role);         
-                return dto;
-            }
+            var entity =  await GetByIdAsync(filtre);  
             return _automapper.Map<GetByIdUserDto>(entity);
         }
 
@@ -105,45 +103,106 @@ namespace ApplicationCore.Concrete
 
                 };
                 SecurityToken token = tokenHandler.CreateToken(securityTokenDescriptor);
+
+                var refreshToken=Guid.NewGuid().ToString();
+                var encyrptRefresh=
+                await _userManager.RemoveAuthenticationTokenAsync(user, "MyApp", "RefreshToken");
+                await _userManager.SetAuthenticationTokenAsync(user,"MyApp","RefreshToken",refreshToken);
+
                 LoginResponseModels loginResponseModel = new()
                 {
                     Email = user.Email,
                     Token = tokenHandler.WriteToken(token),
+                    RefreshToken = refreshToken
                 };
                 return loginResponseModel;
             }
             throw new Exception();
             }
 
-        public async Task<CreateUserDto> Register(CreateUserDto model,Expression<Func<AppUser,bool>>?method=null)
+        public async Task<CreateUserDto> Register(CreateUserDto model)
         {
-            var user = await _readRepository.GetSingleAsync(method);
-            if (user == null)
-            {
-                var entity = _automapper.Map<AppUser>(model);
-                var result = await _baseservice.AddAsync(entity, model.Password,method);
+          
+                var result = await AddAsync(model, model.Password,x=>x.UserName==model.userName);
                 if (result != null)
                 {
                     await _userManager.AddToRoleAsync(result, "user");
                 }
 
                 return _automapper.Map<CreateUserDto>(result);
-            }
-            return _automapper.Map<CreateUserDto>(user);
+          
             
         }
         public async Task<UpdateUserDto> UpdateUser(UpdateUserDto model, Expression<Func<AppUser, bool>> method, Expression<Func<AppUser, object>>[] includes)
         {
-            var entity = await _readRepository.GetSingleAsync(method);
-            if (entity != null)
+
+            var result = await UpdateAsync(model, x=>x.Id==model.Id, includes);
+            return _automapper.Map<UpdateUserDto>(result);
+
+
+        }
+        
+        public async Task<RefreshTokenResponseDtos> RefreshTokenAsync(RefreshTokenRequestDtos models)
+        {
+            var principal=GetPrincipalFromExpiredToken(models.AccessToken);
+            var userid=principal.FindFirstValue(ClaimTypes.NameIdentifier);
+            var user =await _userManager.FindByIdAsync(userid);
+
+            if (user == null) throw new UnauthorizedAccessException();
+
+            var savedRefreshToken = await _userManager.GetAuthenticationTokenAsync(user, "MyApp", "RefreshToken");
+            if (savedRefreshToken != models.RefreshToken) throw new UnauthorizedAccessException("Refresh token geçersiz");
+            
+            var role=await _userManager.GetRolesAsync(user);
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key=Encoding.ASCII.GetBytes(secretKey);
+
+            var tokenDescriptor = new SecurityTokenDescriptor
             {
-                var map = _automapper.Map(model, entity);
-                var result = await _baseservice.UpdateAsync(map, method, includes);
-                return _automapper.Map<UpdateUserDto>(result);
+                Subject = new ClaimsIdentity(new[]
+                {
+                    new Claim(ClaimTypes.NameIdentifier,user.Id.ToString()),
+                    new Claim(ClaimTypes.Email,user.Email),
+                    new Claim(ClaimTypes.Role,role.FirstOrDefault())
+                }),
+                Expires = DateTime.UtcNow.AddMinutes(15),
+                SigningCredentials=new SigningCredentials(new SymmetricSecurityKey(key),SecurityAlgorithms.HmacSha256)
+            };
+
+            var newAccessToken = tokenHandler.WriteToken(tokenHandler.CreateToken(tokenDescriptor));
+            var newRefreshToken=Guid.NewGuid().ToString();
+
+            await _userManager.RemoveAuthenticationTokenAsync(user, "MyApp", "RefreshToken");
+            await _userManager.SetAuthenticationTokenAsync(user,"MyApp","RefreshToken",newRefreshToken); ;
+
+            return new RefreshTokenResponseDtos
+            {
+                AccessToken = newAccessToken,
+                RefreshToken = newRefreshToken
+            };
+        }
+        protected ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
+        {
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateAudience = false,
+                ValidateIssuer = false,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
+                ValidateLifetime = false
+            };
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out var securityToken);
+
+            if (securityToken is not JwtSecurityToken jwtToken ||
+                !jwtToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+            {
+                throw new SecurityTokenException("Invalid token");
             }
-            return _automapper.Map<UpdateUserDto>(entity);
+
+            return principal;
         }
 
-        
     }
 }
