@@ -16,7 +16,7 @@ namespace ApplicationCore.Dto.DevicesDto
         public string Model { get; set; }
         public DateTime PurchaseDate { get; set; }
         public Guid serialNo { get; set; }
-        public Guid UserId { get; set; } 
+        public Guid UserId { get; set; }
 
     }
 }

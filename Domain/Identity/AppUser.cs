@@ -12,6 +12,7 @@ namespace Domain.Identity
     { 
         public string FirstName { get; set; }
         public string LastName { get; set; }
+        public string LastModifiedBy { get; set; }
         public ICollection<NotificationLog> NotificationLog { get; set; }
         public ICollection<FeedBack> FeedBacks { get; set; }
         public ICollection<MeintenanceRecord> MeintenanceRecords { get; set; }

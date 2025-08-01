@@ -1,4 +1,5 @@
 ﻿using ApplicationCore.Abstraction;
+using ApplicationCore.Dto.Token;
 using ApplicationCore.Dto.UserDto;
 using ApplicationCore.Responses;
 using Domain.Entites;
@@ -36,20 +37,14 @@ namespace DeviceCalibrationAndPeriodicMaintenanceSystemm.Controllers
         public async Task<ApiResponse<CreateUserDto>> Register(CreateUserDto model)
         {
             var _apiresponse = new ApiResponse<CreateUserDto>();
-            Expression<Func<AppUser,bool>> method=x=>x.Email==model.Email;
-            _logger.LogInformation("İşlem başladı");
-            var result = await _userService.Register(model,method);
-            if (result != null)
-            {
-                _apiresponse.IsSuccess = true;
-                _apiresponse.HttpStatusCode = HttpStatusCode.OK;
-                _apiresponse.Result = result;
-                return _apiresponse;
-            }
-            _apiresponse.IsSuccess= false;
-            _apiresponse.ErrorMessages.Add("Entity bulunamadı");
-            _apiresponse.HttpStatusCode = HttpStatusCode.NotFound;
+            var result = await _userService.Register(model);
+            
+            _apiresponse.IsSuccess = true;
+            _apiresponse.HttpStatusCode = HttpStatusCode.OK;
+            _apiresponse.Result = result;
             return _apiresponse;
+            
+
 
         }
         [HttpPut("update-user")]
@@ -129,6 +124,16 @@ namespace DeviceCalibrationAndPeriodicMaintenanceSystemm.Controllers
             _apiResponse.HttpStatusCode=HttpStatusCode.NotFound;
             return _apiResponse;
 
+        }
+        [HttpPost("refresh-token")]
+        public async Task<ApiResponse<LoginResponseModels>> RefreshToken([FromBody] RefreshTokenRequestDtos models)
+        {
+            var _apiResponse=new ApiResponse<LoginResponseModels>();
+            var result=await _userService.RefreshTokenAsync(models);
+            _apiResponse.IsSuccess= true;
+            _apiResponse.HttpStatusCode=HttpStatusCode.OK;
+            _apiResponse.Result= result;
+            return _apiResponse;
         }
     }
 }

@@ -7,6 +7,7 @@ using Domain.Entites;
 using Domain.Identity;
 using Domain.Repository;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Identity.Client;
 using System;
@@ -18,51 +19,41 @@ using System.Threading.Tasks;
 
 namespace ApplicationCore.Concrete
 {
-    public class DeviceService :GetClaimsBaseService,IDevicesService
+    public class DeviceService: BaseService<Devices>, IDevicesService
     {
-        private readonly IBaseService<Devices> _baseService;
         private readonly IMapper _mapper;
-        private readonly IReadRepository<Devices> _readRepository;
-        public DeviceService(IHttpContextAccessor _httpContextAccessor, IBaseService<Devices> baseService,IMapper mapper,IReadRepository<Devices> readRepository) :base(_httpContextAccessor)
-        { 
-             _baseService= baseService;
+
+        public DeviceService(IWriteRepository<Devices> writeRepository,
+            IRepository<Devices> repository,
+            IReadRepository<Devices> readRepository,
+            IMapper mapper,
+            UserManager<AppUser> userManager,
+            IHttpContextAccessor httpContextAccessor) :base(writeRepository, mapper, repository, readRepository, userManager, httpContextAccessor)
+        {
             _mapper = mapper;
-            _readRepository= readRepository;
         }
-        public async Task<CreateDeviceDto> CreateDevice(CreateDeviceDto device, params Expression<Func<Devices, object>>[] includes)
-        {   Expression<Func<Devices,bool>> method=x=>x.serialNo==device.serialNo;
-            var entity=await _readRepository.GetSingleAsync(method);
-            if (entity == null)
-            {
+        public async Task<CreateDeviceDto> CreateDevice(CreateDeviceDto device)
+        {   
                 var models = _mapper.Map<Devices>(device);
-                var dto = await _baseService.AddAsync(models, null, method, includes);
+                var dto = await AddAsync(models, null, x=>x.serialNo==device.serialNo);
                 return _mapper.Map<CreateDeviceDto>(dto);
-            }
-            return null;
 
         }
         public async Task<UpdateDeviceDto> UpdateDevice(UpdateDeviceDto models,Guid id,params Expression<Func<Devices, object>>[] includes)
         {
-            Expression<Func<Devices,bool>> method=x=>x.Id==id;
-            var entity = await _readRepository.GetSingleAsync(method);
-            if (entity == null) return null;
+            var entity = _mapper.Map<Devices>(models);
             var model = _mapper.Map(models, entity);
-            var result = await _baseService.UpdateAsync(model, method,includes);
+            var result = await UpdateAsync(model, x=>x.Id==id,includes);
             return _mapper.Map<UpdateDeviceDto>(result);
         }
         public async Task<DeleteDeviceDtos> DeleteDevice(Guid id)
-        {   var entity=await _readRepository.GetByIdAsync(id);
-            if (entity != null)
-            {
-                var result = await _baseService.DeleteAsync(id);
-                var model = _mapper.Map<DeleteDeviceDtos>(result);
-            }
-            return _mapper.Map<DeleteDeviceDtos>(entity);
+        {   var result=await DeleteAsync(id);
+            return _mapper.Map<DeleteDeviceDtos>(result);
  
         }
         public async Task<List<GetDeviceDto>> GetAllDevice()
         {
-            var result = await _baseService.GetAllAsync();
+            var result = await GetAllAsync();
             var users=new List<GetDeviceDto>();
 
             foreach (var models in result)
@@ -74,14 +65,10 @@ namespace ApplicationCore.Concrete
         }
         public async Task<GetDeviceDto> GetByIdDevice(Guid id, params Expression<Func<Devices, object>>[] includes)
         {
-            Expression<Func<Devices, bool>> filtre = x => x.Id == id;
-            var entity = await _readRepository.GetSingleAsync(filtre);
-            if (entity != null)
-            {
-                var result = await _baseService.GetByIdAsync(filtre, includes);
-                return _mapper.Map<GetDeviceDto>(result);
-            }
-            return _mapper.Map<GetDeviceDto>(entity);
+            var result = await GetByIdAsync(x=>x.Id==id);
+
+              return _mapper.Map<GetDeviceDto>(result);
+
           
         }
 
