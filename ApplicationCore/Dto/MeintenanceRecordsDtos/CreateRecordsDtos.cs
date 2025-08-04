@@ -17,6 +17,5 @@ namespace ApplicationCore.Dto.MeintenanceRecordsDtos
         public DateTime startMeintenceDay { get; set; }
         public DateTime lastMaintenceDay { get; set; }
         public Guid? devicesId { get; set; }
-        public Guid? userId { get; set; }
     }
 }

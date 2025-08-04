@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastucture.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250801062811_mig11")]
-    partial class mig11
+    [Migration("20250803155302_mig3")]
+    partial class mig3
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -93,6 +93,10 @@ namespace Infrastucture.Migrations
                     b.Property<DateTime>("CreatedTime")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("ImagePath")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -107,10 +111,10 @@ namespace Infrastucture.Migrations
                     b.Property<DateTime>("PurchaseDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("UserId")
+                    b.Property<Guid?>("SerialNo")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("serialNo")
+                    b.Property<Guid?>("UserId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
@@ -215,40 +219,40 @@ namespace Infrastucture.Migrations
                     b.Property<DateTime>("CreatedTime")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("DevicesId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Intervaldays")
+                        .HasColumnType("int");
+
                     b.Property<bool>("IsCompleted")
                         .HasColumnType("bit");
+
+                    b.Property<DateTime>("LastMaintenceDay")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("devicesId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("intervaldays")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("lastMaintenceDay")
+                    b.Property<DateTime>("StartMeintenceDay")
                         .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("startMeintenceDay")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("userId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("devicesId");
+                    b.HasIndex("DevicesId");
 
-                    b.HasIndex("userId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("meintenanceRecord");
                 });
@@ -269,6 +273,9 @@ namespace Infrastucture.Migrations
                     b.Property<DateTime>("CreatedTime")
                         .HasColumnType("datetime2");
 
+                    b.Property<Guid?>("DevicesId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<bool>("IsSend")
                         .HasColumnType("bit");
 
@@ -282,14 +289,11 @@ namespace Infrastucture.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("devicesId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("MeintenanceRecordId");
+                    b.HasIndex("DevicesId");
 
-                    b.HasIndex("devicesId");
+                    b.HasIndex("MeintenanceRecordId");
 
                     b.ToTable("notificationLogs");
                 });
@@ -347,7 +351,6 @@ namespace Infrastucture.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LastModifiedBy")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LastName")
@@ -559,11 +562,11 @@ namespace Infrastucture.Migrations
                 {
                     b.HasOne("Domain.Entites.Devices", "devices")
                         .WithMany("meintenanceRecords")
-                        .HasForeignKey("devicesId");
+                        .HasForeignKey("DevicesId");
 
                     b.HasOne("Domain.Identity.AppUser", "appUser")
                         .WithMany("MeintenanceRecords")
-                        .HasForeignKey("userId");
+                        .HasForeignKey("UserId");
 
                     b.Navigation("appUser");
 
@@ -572,13 +575,13 @@ namespace Infrastucture.Migrations
 
             modelBuilder.Entity("Domain.Entites.NotificationLog", b =>
                 {
+                    b.HasOne("Domain.Entites.Devices", "devices")
+                        .WithMany("NotificationLogs")
+                        .HasForeignKey("DevicesId");
+
                     b.HasOne("Domain.Entites.MeintenanceRecord", "meintenanceRecord")
                         .WithMany("notificationLogs")
                         .HasForeignKey("MeintenanceRecordId");
-
-                    b.HasOne("Domain.Entites.Devices", "devices")
-                        .WithMany("NotificationLogs")
-                        .HasForeignKey("devicesId");
 
                     b.Navigation("devices");
 

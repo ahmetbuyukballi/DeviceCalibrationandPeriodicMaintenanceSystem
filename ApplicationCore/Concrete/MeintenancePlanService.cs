@@ -20,15 +20,18 @@ namespace ApplicationCore.Concrete
     public class MeintenancePlanService : BaseService<MeintenancePlan>,IMeintenancePlanService
     {
         private readonly IMapper _mapper;
+        private readonly GetClaimsBaseService _getClaimsBaseService;
 
         public MeintenancePlanService(IWriteRepository<MeintenancePlan> writeRepository,
             IRepository<MeintenancePlan> repository,
             IReadRepository<MeintenancePlan> readRepository,
             IMapper mapper,
             UserManager<AppUser> userManager,
-            IHttpContextAccessor httpContextAccessor) : base(writeRepository, mapper, repository, readRepository, userManager, httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor,
+            GetClaimsBaseService getClaimsBaseService) : base(writeRepository, mapper, repository, readRepository, userManager, httpContextAccessor)
         {
             _mapper = mapper;
+            _getClaimsBaseService = getClaimsBaseService;
         }
         public async Task<CreateMeintenancePlanDto> CreatePlan(CreateMeintenancePlanDto model,Expression<Func<MeintenancePlan,bool>>?filtre=null,params Expression<Func<MeintenancePlan, object>>[] include)
         { 

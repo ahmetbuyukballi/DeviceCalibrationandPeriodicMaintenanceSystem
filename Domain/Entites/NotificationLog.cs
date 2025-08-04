@@ -14,8 +14,8 @@ namespace Domain.Entites
         public bool IsSend { get; set; }
         public string Type { get; set; }
         public ICollection<AppUser> AppUsers { get; set; }
-        public Guid? devicesId { get; set; }
-        [ForeignKey("devicesId")]
+        public Guid? DevicesId { get; set; }
+        [ForeignKey("DevicesId")]
         public Devices devices { get; set; }
         public Guid? MeintenanceRecordId { get; set; }
         [ForeignKey("MeintenanceRecordId")]

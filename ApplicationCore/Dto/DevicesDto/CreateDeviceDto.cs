@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace ApplicationCore.Dto.DevicesDto
@@ -16,7 +17,6 @@ namespace ApplicationCore.Dto.DevicesDto
         public string Model { get; set; }
         public DateTime PurchaseDate { get; set; }
         public Guid serialNo { get; set; }
-        public Guid UserId { get; set; }
 
     }
 }

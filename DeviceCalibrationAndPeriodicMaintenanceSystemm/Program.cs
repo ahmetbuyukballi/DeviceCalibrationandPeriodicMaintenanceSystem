@@ -1,7 +1,6 @@
 using Domain.Identity;
 using Microsoft.AspNetCore.Identity;
 using Infrastucture.Persistence;
-using Domain.Entites;
 using Infrastucture.DataSeeder;
 using Infrastucture;
 using Domain;
@@ -11,12 +10,10 @@ using Serilog;
 using DeviceCalibrationAndPeriodicMaintenanceSystemm.ExpectionMiddleware;
 using ApplicationCore.Abstraction;
 using ApplicationCore.Concrete;
-using ApplicationCore.BaseService;
-using ApplicationCore.MappingProfile;
-using System.Text.Json.Serialization;
 using ApplicationCore.MailService;
 using DeviceCalibrationAndPeriodicMaintenanceSystemm;
 using Infrastucture.Audit;
+
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -48,6 +45,7 @@ builder.Services.AddScoped(typeof(IMeintenanceRecordService), typeof(Meintenance
 builder.Services.AddScoped<MailService>();
 builder.Services.AddScoped(typeof(IBaseService<>), typeof(GenericSingletionService<>));
 builder.Services.AddScoped(typeof(BeforeSaveChanges));
+builder.Services.AddScoped<IUploadImageService, UploadImageService>();
 
 
 
@@ -96,7 +94,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+app.UseStaticFiles();
 app.UseMiddleware<ExpectionMiddleware>(); // kendi middleware'in
 app.UseHttpsRedirection();
 app.UseAuthentication();

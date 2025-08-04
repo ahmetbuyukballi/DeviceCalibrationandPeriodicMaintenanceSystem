@@ -46,8 +46,8 @@ namespace ApplicationCore.Concrete
                             var record = await _baseService.GetByIdAsync(x => x.Id == item.Id, x => x.MeintenanceRecords);
                             foreach (var models in record.MeintenanceRecords)
                             {
-                                var time = DateTime.Now - models.lastMaintenceDay;
-                                var result = models.intervaldays - (int)time.TotalDays;
+                                var time = DateTime.Now - models.LastMaintenceDay;
+                                var result = models.Intervaldays - (int)time.TotalDays;
                                 if (result == 5)
                                 {
                                     if (!string.IsNullOrWhiteSpace(record.Email))
@@ -56,7 +56,7 @@ namespace ApplicationCore.Concrete
                                         var model = new CreateNotificationLogDtos{
                                             Content= $"{models.name} isimli bakım planı hakkında.Bakımınıza 5 gün kalmıştır.İyi günler dileriz",
                                             Type="Gmail",
-                                            devicesId=models.devicesId,
+                                            devicesId=models.DevicesId,
                                             MeintenanceRecordId=models.Id
                                         };
                                         var notificationLg = _mapper.Map<NotificationLog>(model);
@@ -73,7 +73,7 @@ namespace ApplicationCore.Concrete
                                         {
                                             Content = $"{models.name} isimli bakım planı hakkında.Bakım gününüz geçmiştir.Lütfen en kısa sürede cihazınızı bakıma getiriniz.İyi günler dileriz",
                                             Type = "Gmail",
-                                            devicesId =models.devicesId,
+                                            devicesId =models.DevicesId,
                                             MeintenanceRecordId =models.Id
                                         };
                                         var notificationLg = _mapper.Map<NotificationLog>(model);

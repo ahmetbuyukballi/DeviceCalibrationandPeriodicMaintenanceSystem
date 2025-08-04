@@ -6,6 +6,7 @@ using AutoMapper;
 using Domain.Entites;
 using Domain.Identity;
 using Domain.Repository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
@@ -19,26 +20,43 @@ using System.Threading.Tasks;
 
 namespace ApplicationCore.Concrete
 {
-    public class DeviceService: BaseService<Devices>, IDevicesService
+    public class DeviceService:BaseService<Devices>, IDevicesService
     {
         private readonly IMapper _mapper;
-
+        private readonly IUploadImageService _uploadImageService;
+        private readonly GetClaimsBaseService _getClaimsBaseService;
         public DeviceService(IWriteRepository<Devices> writeRepository,
             IRepository<Devices> repository,
             IReadRepository<Devices> readRepository,
             IMapper mapper,
             UserManager<AppUser> userManager,
-            IHttpContextAccessor httpContextAccessor) :base(writeRepository, mapper, repository, readRepository, userManager, httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor,
+            IUploadImageService uploadImageService,
+            GetClaimsBaseService getClaimsBaseService) :base(writeRepository, mapper, repository, readRepository, userManager, httpContextAccessor)
         {
             _mapper = mapper;
+            _uploadImageService = uploadImageService;
+            _getClaimsBaseService = getClaimsBaseService;
         }
-        public async Task<CreateDeviceDto> CreateDevice(CreateDeviceDto device)
-        {   
+        public async Task<CreateDeviceDto> CreateDevice(CreateDeviceDto device, IFormFile? file)
+        {
+            if (file != null&&file.ContentType=="image/png"|| file.ContentType=="image/jpeg")
+            {
+                var ImageUrl=await _uploadImageService.UploadImageAsync(file);
+                var entity= _mapper.Map<Devices>(device);
+                entity.UserId = _getClaimsBaseService.GetUserId();
+                entity.ImagePath = ImageUrl;
+                var result=await AddAsync(entity, null, x => x.SerialNo == device.serialNo);
+                return _mapper.Map<CreateDeviceDto>(result);
+
+            }
                 var models = _mapper.Map<Devices>(device);
-                var dto = await AddAsync(models, null, x=>x.serialNo==device.serialNo);
-                return _mapper.Map<CreateDeviceDto>(dto);
+                var model = await AddAsync(models, null, x=>x.SerialNo==device.serialNo);
+                model.UserId = _getClaimsBaseService.GetUserId();
+                return _mapper.Map<CreateDeviceDto>(model);
 
         }
+        [Authorize(Roles ="admin")]
         public async Task<UpdateDeviceDto> UpdateDevice(UpdateDeviceDto models,Guid id,params Expression<Func<Devices, object>>[] includes)
         {
             var entity = _mapper.Map<Devices>(models);
@@ -51,6 +69,7 @@ namespace ApplicationCore.Concrete
             return _mapper.Map<DeleteDeviceDtos>(result);
  
         }
+        [Authorize(Roles ="admin")]
         public async Task<List<GetDeviceDto>> GetAllDevice()
         {
             var result = await GetAllAsync();
@@ -63,6 +82,7 @@ namespace ApplicationCore.Concrete
             }
             return users;
         }
+        [Authorize(Roles ="admin")]
         public async Task<GetDeviceDto> GetByIdDevice(Guid id, params Expression<Func<Devices, object>>[] includes)
         {
             var result = await GetByIdAsync(x=>x.Id==id);

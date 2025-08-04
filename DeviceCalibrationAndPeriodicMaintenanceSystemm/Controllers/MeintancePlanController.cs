@@ -33,6 +33,7 @@ namespace DeviceCalibrationAndPeriodicMaintenanceSystemm.Controllers
             _apiResponse.Result = result;
             return _apiResponse;
         }
+
         [HttpDelete("delete-plan")]
         public async Task<ApiResponse<DeleteMeintenancePlanDto>> DeletePlan(Guid id)
         {
@@ -57,6 +58,7 @@ namespace DeviceCalibrationAndPeriodicMaintenanceSystemm.Controllers
             _apiResponse.Result = result;
             return _apiResponse;
         }
+        [AllowAnonymous]
         [HttpGet("get-plan")]
         public async Task<ApiResponse<GetMeintenancePlanDtos>> GetAllPlan()
         {
@@ -69,6 +71,7 @@ namespace DeviceCalibrationAndPeriodicMaintenanceSystemm.Controllers
             _apiResponse.Result = result;
             return _apiResponse;
         }
+        [AllowAnonymous]
         [HttpGet("get-id-plan")]
         public async Task<ApiResponse<GetMeintenancePlanDtos>> GetIdPlan(Guid id)
         {

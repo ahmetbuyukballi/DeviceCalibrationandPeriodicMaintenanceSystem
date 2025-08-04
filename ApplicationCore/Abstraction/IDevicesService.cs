@@ -1,5 +1,6 @@
 ﻿using ApplicationCore.Dto.DevicesDto;
 using Domain.Entites;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Identity.Client;
 using System;
@@ -13,7 +14,7 @@ namespace ApplicationCore.Abstraction
 {
     public interface IDevicesService
     {
-        public Task<CreateDeviceDto> CreateDevice(CreateDeviceDto model);
+        public Task<CreateDeviceDto> CreateDevice(CreateDeviceDto model,IFormFile file);
         public Task<UpdateDeviceDto> UpdateDevice(UpdateDeviceDto device,Guid id,params Expression<Func<Devices,object>>[] includes);
         public Task<DeleteDeviceDtos> DeleteDevice(Guid id);
         public Task<List<GetDeviceDto>> GetAllDevice();

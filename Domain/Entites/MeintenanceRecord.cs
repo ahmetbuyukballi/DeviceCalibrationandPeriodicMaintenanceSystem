@@ -11,16 +11,16 @@ namespace Domain.Entites
     public class MeintenanceRecord:EntityBase
     {
         public string name { get; set; }
-        public string description { get; set; }
+        public string Description { get; set; }
         public bool IsCompleted { get; set; }
-        public int intervaldays { get; set; }
-        public DateTime startMeintenceDay { get; set; }
-        public DateTime lastMaintenceDay { get; set; }
-        public Guid? devicesId { get; set; }
-        [ForeignKey("devicesId")]
+        public int Intervaldays { get; set; }
+        public DateTime StartMeintenceDay { get; set; }
+        public DateTime LastMaintenceDay { get; set; }
+        public Guid? DevicesId { get; set; }
+        [ForeignKey("DevicesId")]
         public Devices devices { get; set; }   
-        public Guid? userId { get; set; }
-        [ForeignKey("userId")]
+        public Guid? UserId { get; set; }
+        [ForeignKey("UserId")]
         public AppUser appUser { get; set; }
         public ICollection<NotificationLog> notificationLogs { get; set; }
 
