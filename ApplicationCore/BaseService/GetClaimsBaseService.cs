@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace ApplicationCore.BaseService
 {
-    public abstract class GetClaimsBaseService 
+    public  class GetClaimsBaseService 
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         public GetClaimsBaseService(IHttpContextAccessor httpContextAccessor)
