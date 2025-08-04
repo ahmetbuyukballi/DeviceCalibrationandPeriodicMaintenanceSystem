@@ -13,6 +13,8 @@ using ApplicationCore.Concrete;
 using ApplicationCore.MailService;
 using DeviceCalibrationAndPeriodicMaintenanceSystemm;
 using Infrastucture.Audit;
+using Org.BouncyCastle.Asn1.X509.Qualified;
+using ApplicationCore.BaseService;
 
 
 
@@ -46,7 +48,7 @@ builder.Services.AddScoped<MailService>();
 builder.Services.AddScoped(typeof(IBaseService<>), typeof(GenericSingletionService<>));
 builder.Services.AddScoped(typeof(BeforeSaveChanges));
 builder.Services.AddScoped<IUploadImageService, UploadImageService>();
-
+builder.Services.AddScoped(typeof(GetClaimsBaseService));
 
 
 
