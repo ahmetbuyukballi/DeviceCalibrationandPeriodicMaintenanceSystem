@@ -363,3 +363,4 @@ MigrationBackup/
 FodyWeavers.xsd
 /DeviceCalibrationAndPeriodicMaintenanceSystemm/appsettings.json
 /DeviceCalibrationAndPeriodicMaintenanceSystemm/wwwroot/Uploads
+/DeviceCalibrationAndPeriodicMaintenanceSystemm/ServiceRegistiration.cs
