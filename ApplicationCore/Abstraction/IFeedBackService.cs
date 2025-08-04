@@ -15,7 +15,7 @@ namespace ApplicationCore.Abstraction
         public  Task<CreateFeedBackDto> CreateFeedBack(CreateFeedBackDto models,params Expression<Func<FeedBack, object>>[] includes);
         public Task<UpdateFeedBackDto> UpdateFeedback(UpdateFeedBackDto models, params Expression<Func<FeedBack, object>>[] includes);
         public Task<DeleteFeedBackDto> DeleteFeedBack(Guid id);
-        public Task<List<GetFeedBackDto>> GetAllFeedBack();
+        public Task<List<GetFeedBackDto>> GetAllFeedBack(Expression<Func<FeedBack, bool>>? filter = null, params Expression<Func<FeedBack, object>>[] includes);
         public Task<GetFeedBackDto> GetByIdFeedBack(Guid id);
     }
 }

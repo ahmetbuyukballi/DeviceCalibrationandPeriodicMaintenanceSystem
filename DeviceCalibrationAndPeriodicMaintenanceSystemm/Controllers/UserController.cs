@@ -86,7 +86,7 @@ namespace DeviceCalibrationAndPeriodicMaintenanceSystemm.Controllers
             _apiResponse.HttpStatusCode=HttpStatusCode.NotFound;
             return _apiResponse;
         }
-       // [Authorize(Policy= "Admin rolü ara")]
+       [Authorize(Roles ="admin")]
         [HttpGet("getall-user")]
         public async Task<ApiResponse<GetAllUserDto>> GetAll()
         {
@@ -106,6 +106,7 @@ namespace DeviceCalibrationAndPeriodicMaintenanceSystemm.Controllers
             return _apiResponse;
             
         }
+        [Authorize(Roles ="admin")]
         [HttpGet("getbyid-user")]
         public async Task<ApiResponse<GetByIdUserDto>> GetById(Guid id)
         {

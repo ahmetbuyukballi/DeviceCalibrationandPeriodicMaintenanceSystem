@@ -16,7 +16,7 @@ namespace ApplicationCore.BaseService
         {
             _httpContextAccessor = httpContextAccessor;
         }
-        protected  Guid GetUserId()
+        public  Guid GetUserId()
         {
             var IdStr = _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier);
             return Guid.TryParse(IdStr, out var id) ? id : Guid.Empty;

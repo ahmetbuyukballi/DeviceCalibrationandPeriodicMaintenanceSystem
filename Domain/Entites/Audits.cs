@@ -9,7 +9,7 @@ namespace Domain.Entites
     public class Audits
     {
         public string Id { get; set; }
-        public string  UserId { get; set; }
+        public string?  UserId { get; set; }
         public string Type { get; set; }
         public string TableName { get; set; }
         public DateTime DateTime { get; set; }

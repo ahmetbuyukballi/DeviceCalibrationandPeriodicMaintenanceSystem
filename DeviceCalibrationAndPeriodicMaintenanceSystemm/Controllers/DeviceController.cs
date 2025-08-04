@@ -23,10 +23,10 @@ namespace DeviceCalibrationAndPeriodicMaintenanceSystemm.Controllers
             _logger = logger;
         }
         [HttpPost("add-device")]
-        public async Task<ApiResponse<CreateDeviceDto>> CreateDevie(CreateDeviceDto models)
+        public async Task<ApiResponse<CreateDeviceDto>> CreateDevie(CreateDeviceDto models,IFormFile? formFile)
         {
             _logger.LogInformation("Ekleme işlemi başlatılıyor");
-            var result = await _deviceService.CreateDevice(models);
+            var result = await _deviceService.CreateDevice(models,formFile);
             var _apiResponse = new ApiResponse<CreateDeviceDto?>();
           
             _apiResponse.IsSuccess=true;
@@ -65,17 +65,12 @@ namespace DeviceCalibrationAndPeriodicMaintenanceSystemm.Controllers
             var _apiResponse=new ApiResponse<GetDeviceDto>();
             _logger.LogInformation("Cihaz listeleniyor");
             var result = await _deviceService.GetByIdDevice(id);
-            if (result != null)
-            {
-                _apiResponse.IsSuccess = true;
-                _apiResponse.HttpStatusCode = System.Net.HttpStatusCode.OK;
-                _apiResponse.Result = result;
-                return _apiResponse;
-            }
-            _apiResponse.IsSuccess = false;
-            _apiResponse.ErrorMessages.Add("Entity bulunamadı");
-            _apiResponse.HttpStatusCode= System.Net.HttpStatusCode.NotFound;
-            return _apiResponse;
+
+             _apiResponse.IsSuccess = true;
+             _apiResponse.HttpStatusCode = System.Net.HttpStatusCode.OK;
+             _apiResponse.Result = result;
+             return _apiResponse;
+        
         }
         [HttpPut("update-device")]
         public async Task<ApiResponse<UpdateDeviceDto>> UpdateDevice([FromBody] UpdateDeviceDto model,Guid id)

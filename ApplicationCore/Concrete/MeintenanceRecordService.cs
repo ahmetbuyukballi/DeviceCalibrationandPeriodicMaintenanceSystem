@@ -22,18 +22,22 @@ namespace ApplicationCore.Concrete
     {
       
         private readonly IMapper _mapper;
+        private readonly GetClaimsBaseService _getClaimsBaseService;
         public MeintenanceRecordService(IWriteRepository<MeintenanceRecord> writeRepository,
             IRepository<MeintenanceRecord> repository,
             IReadRepository<MeintenanceRecord> readRepository,
             IMapper mapper,
             UserManager<AppUser> userManager,
-            IHttpContextAccessor httpContextAccessor) : base(writeRepository, mapper, repository, readRepository, userManager, httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor,
+            GetClaimsBaseService getClaimsBaseService) : base(writeRepository, mapper, repository, readRepository, userManager, httpContextAccessor)
         {
             _mapper = mapper;
+            _getClaimsBaseService= getClaimsBaseService;
         }
         public async Task<CreateRecordsDtos> CreateRecords(CreateRecordsDtos models, params Expression<Func<MeintenanceRecord, object>>[] includes)
         {
             var result = await AddAsync(models, null, x => x.name == models.name);
+            result.UserId=_getClaimsBaseService.GetUserId();
             return _mapper.Map<CreateRecordsDtos>(result);
         }
 

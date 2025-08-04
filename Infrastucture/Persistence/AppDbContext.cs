@@ -12,6 +12,8 @@ using System.Reflection;
 using Infrastucture.Audit;
 using System.Security.AccessControl;
 using Microsoft.AspNetCore.Http;
+using Domain;
+using System.Security.Claims;
 
 namespace Infrastucture.Persistence
 
@@ -19,9 +21,11 @@ namespace Infrastucture.Persistence
     public class AppDbContext : IdentityDbContext<AppUser, AppRole, Guid>
     {
         private readonly BeforeSaveChanges _beforeSaveChanges;
-        public AppDbContext(DbContextOptions options,BeforeSaveChanges beforeSaveChanges) : base(options)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public AppDbContext(DbContextOptions options,BeforeSaveChanges beforeSaveChanges, IHttpContextAccessor httpContextAccessor) : base(options)
         {
             _beforeSaveChanges = beforeSaveChanges;
+            _httpContextAccessor = httpContextAccessor;
         }
         public DbSet<Devices> devices { get; set; }
         public DbSet<FeedBack> feedback { get; set; }
@@ -48,19 +52,17 @@ namespace Infrastucture.Persistence
         }
         public override int SaveChanges()
         {
-            // veya DI ile alırsın
             var auditLogs = _beforeSaveChanges.PrepareAuditLogs(ChangeTracker);
             AuditLogs.AddRange(auditLogs);
 
             return base.SaveChanges();
         }
-        public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
+        public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess,CancellationToken cancellationToken = default)
         {
-           // veya DI ile alırsın
-            var auditLogs = _beforeSaveChanges.PrepareAuditLogs(ChangeTracker);
-            AuditLogs.AddRange(auditLogs);
+             var auditLogs = _beforeSaveChanges.PrepareAuditLogs(ChangeTracker);
+             AuditLogs.AddRange(auditLogs);
 
-            return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+            return base.SaveChangesAsync(acceptAllChangesOnSuccess,cancellationToken);
         }
 
     }

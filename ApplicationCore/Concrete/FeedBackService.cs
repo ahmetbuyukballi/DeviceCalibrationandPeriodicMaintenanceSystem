@@ -20,20 +20,24 @@ namespace ApplicationCore.Concrete
     {
         
         private readonly IMapper _mapper;
+        private readonly GetClaimsBaseService _getClaimsBaseService;
 
         public FeedBackService(IWriteRepository<FeedBack> writeRepository,
             IRepository<FeedBack> repository,
             IReadRepository<FeedBack> readRepository,
             IMapper mapper,
             UserManager<AppUser> userManager,
-            IHttpContextAccessor httpContextAccessor):base(writeRepository, mapper, repository, readRepository, userManager, httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor,
+            GetClaimsBaseService getClaimsBaseService):base(writeRepository, mapper, repository, readRepository, userManager, httpContextAccessor)
         {
           _mapper = mapper;
+            _getClaimsBaseService = getClaimsBaseService;
         }
 
         public async Task<CreateFeedBackDto> CreateFeedBack(CreateFeedBackDto models, params Expression<Func<FeedBack, object>>[] includes)
         {
-            var entity=_mapper.Map<FeedBack>(models);   
+            var entity=_mapper.Map<FeedBack>(models); 
+            entity.UserId=_getClaimsBaseService.GetUserId();
             var result = await AddAsync(entity,null,null);
             return _mapper.Map<CreateFeedBackDto>(result);
         }
@@ -44,7 +48,7 @@ namespace ApplicationCore.Concrete
             return _mapper.Map<DeleteFeedBackDto>(result);
         }
 
-        public async Task<List<GetFeedBackDto>> GetAllFeedBack()
+        public async Task<List<GetFeedBackDto>> GetAllFeedBack(Expression<Func<FeedBack,bool>>? filter=null,params Expression<Func<FeedBack, object>>[] includes)
         {
             var result=await GetAllAsync();
             var feedBacks=new List<GetFeedBackDto>();

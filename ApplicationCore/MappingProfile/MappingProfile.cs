@@ -34,9 +34,8 @@ namespace ApplicationCore.MappingProfile
             CreateMap<DeleteUserDtos, AppUser>();
 
             // Cihaz mappingleri
-            CreateMap<Devices, CreateDeviceDto>()
-                .ForMember(x => x.UserId,opt=>opt.MapFrom(x=>x.UserId))
-                .ReverseMap();
+            CreateMap<Devices, CreateDeviceDto>();
+            CreateMap<CreateDeviceDto, Devices>();
             CreateMap<Devices, DeleteDeviceDtos>();
             CreateMap<Devices, UpdateDeviceDto>();
             CreateMap<UpdateDeviceDto, Devices>();

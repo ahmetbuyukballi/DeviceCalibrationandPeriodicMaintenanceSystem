@@ -1,5 +1,6 @@
 ﻿using Domain.Attribute;
 using Domain.Identity;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -13,8 +14,9 @@ namespace Domain.Entites
     {
         public string Name { get; set; }
         public string Model {  get; set; }
+        public string? ImagePath { get; set; }
         public DateTime PurchaseDate { get; set; }
-        public Guid? serialNo { get; set; }
+        public Guid? SerialNo { get; set; }
 
         public Guid? UserId { get; set; }
         [ForeignKey("UserId")]

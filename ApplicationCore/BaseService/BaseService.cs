@@ -45,6 +45,7 @@ namespace ApplicationCore.BaseService
 
         public virtual async Task<TModel> AddAsync<TDto>(TDto model ,string? password, Expression<Func<TModel,bool>>?method=null,params Expression<Func<TModel, object>>?[] references)
         {
+           Console.WriteLine("Entitiy bu:"+model.GetType().Name);
            var entity= _autpMapper.Map<TModel>(model);
             if (entity.GetType() == typeof(AppUser))
             {
@@ -121,7 +122,7 @@ namespace ApplicationCore.BaseService
             }
             throw new DirectoryNotFoundException("Bu veri elimizde yok");
         }
-
+     
         private async Task LoadReference(Expression<Func<TModel,bool>> method, params Expression<Func<TModel, object>>[] references)
         {
             foreach(var reference in references)

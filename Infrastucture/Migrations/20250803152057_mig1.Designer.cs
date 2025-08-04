@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastucture.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250729120158_mig6")]
-    partial class mig6
+    [Migration("20250803152057_mig1")]
+    partial class mig1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -40,14 +40,65 @@ namespace Infrastucture.Migrations
                     b.ToTable("UserNotification", (string)null);
                 });
 
+            modelBuilder.Entity("Domain.Entites.Audits", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("AffectedColumns")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("NewValues")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OldValues")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PrimaryKey")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TableName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AuditLogs");
+                });
+
             modelBuilder.Entity("Domain.Entites.Devices", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("CreatedTime")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("ImagePath")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Model")
                         .IsRequired()
@@ -60,10 +111,10 @@ namespace Infrastucture.Migrations
                     b.Property<DateTime>("PurchaseDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid?>("UserId")
+                    b.Property<Guid?>("SerialNo")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("serialNo")
+                    b.Property<Guid?>("UserId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
@@ -82,6 +133,9 @@ namespace Infrastucture.Migrations
                     b.Property<Guid>("AppUsersId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("CreatedTime")
                         .HasColumnType("datetime2");
 
@@ -91,6 +145,9 @@ namespace Infrastucture.Migrations
 
                     b.Property<Guid?>("DeviceId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -117,6 +174,9 @@ namespace Infrastucture.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("CreatedTime")
                         .HasColumnType("datetime2");
 
@@ -129,6 +189,9 @@ namespace Infrastucture.Migrations
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -150,40 +213,46 @@ namespace Infrastucture.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("CreatedTime")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("DevicesId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Intervaldays")
+                        .HasColumnType("int");
 
                     b.Property<bool>("IsCompleted")
                         .HasColumnType("bit");
 
-                    b.Property<string>("description")
-                        .IsRequired()
+                    b.Property<DateTime>("LastMaintenceDay")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("LastModifiedBy")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("devicesId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("intervaldays")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("lastMaintenceDay")
+                    b.Property<DateTime>("StartMeintenceDay")
                         .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("startMeintenceDay")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("userId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("devicesId");
+                    b.HasIndex("DevicesId");
 
-                    b.HasIndex("userId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("meintenanceRecord");
                 });
@@ -198,11 +267,20 @@ namespace Infrastucture.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("CreatedTime")
                         .HasColumnType("datetime2");
 
+                    b.Property<Guid?>("DevicesId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<bool>("IsSend")
                         .HasColumnType("bit");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("MeintenanceRecordId")
                         .HasColumnType("uniqueidentifier");
@@ -211,14 +289,11 @@ namespace Infrastucture.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("devicesId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("MeintenanceRecordId");
+                    b.HasIndex("DevicesId");
 
-                    b.HasIndex("devicesId");
+                    b.HasIndex("MeintenanceRecordId");
 
                     b.ToTable("notificationLogs");
                 });
@@ -248,7 +323,7 @@ namespace Infrastucture.Migrations
                         .HasDatabaseName("RoleNameIndex")
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
-                    b.ToTable("AspNetRoles", (string)null);
+                    b.ToTable("Role", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Identity.AppUser", b =>
@@ -272,6 +347,10 @@ namespace Infrastucture.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastModifiedBy")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -322,7 +401,7 @@ namespace Infrastucture.Migrations
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
-                    b.ToTable("AspNetUsers", (string)null);
+                    b.ToTable("User", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -346,7 +425,7 @@ namespace Infrastucture.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("AspNetRoleClaims", (string)null);
+                    b.ToTable("RoleClaim", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
@@ -370,7 +449,7 @@ namespace Infrastucture.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AspNetUserClaims", (string)null);
+                    b.ToTable("UserClaim", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
@@ -391,7 +470,7 @@ namespace Infrastucture.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AspNetUserLogins", (string)null);
+                    b.ToTable("UserLogin", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
@@ -406,7 +485,7 @@ namespace Infrastucture.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("AspNetUserRoles", (string)null);
+                    b.ToTable("UserRole", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
@@ -425,7 +504,7 @@ namespace Infrastucture.Migrations
 
                     b.HasKey("UserId", "LoginProvider", "Name");
 
-                    b.ToTable("AspNetUserTokens", (string)null);
+                    b.ToTable("UserToken", (string)null);
                 });
 
             modelBuilder.Entity("AppUserNotificationLog", b =>
@@ -484,11 +563,11 @@ namespace Infrastucture.Migrations
                 {
                     b.HasOne("Domain.Entites.Devices", "devices")
                         .WithMany("meintenanceRecords")
-                        .HasForeignKey("devicesId");
+                        .HasForeignKey("DevicesId");
 
                     b.HasOne("Domain.Identity.AppUser", "appUser")
                         .WithMany("MeintenanceRecords")
-                        .HasForeignKey("userId");
+                        .HasForeignKey("UserId");
 
                     b.Navigation("appUser");
 
@@ -497,13 +576,13 @@ namespace Infrastucture.Migrations
 
             modelBuilder.Entity("Domain.Entites.NotificationLog", b =>
                 {
+                    b.HasOne("Domain.Entites.Devices", "devices")
+                        .WithMany("NotificationLogs")
+                        .HasForeignKey("DevicesId");
+
                     b.HasOne("Domain.Entites.MeintenanceRecord", "meintenanceRecord")
                         .WithMany("notificationLogs")
                         .HasForeignKey("MeintenanceRecordId");
-
-                    b.HasOne("Domain.Entites.Devices", "devices")
-                        .WithMany("NotificationLogs")
-                        .HasForeignKey("devicesId");
 
                     b.Navigation("devices");
 

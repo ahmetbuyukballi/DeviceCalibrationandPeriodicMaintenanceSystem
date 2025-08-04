@@ -8,7 +8,7 @@ using System.Linq.Expressions;
 
 namespace DeviceCalibrationAndPeriodicMaintenanceSystemm.Controllers
 {
-    [Authorize]
+    [Authorize(Roles ="admin")]
     [Route("api/MeintenanceRecords")]
     public class MeintenanceRecordsController : ControllerBase
     {
@@ -52,6 +52,7 @@ namespace DeviceCalibrationAndPeriodicMaintenanceSystemm.Controllers
             _apiResponse.Result = result;
             return _apiResponse;
         }
+        [AllowAnonymous]
         [HttpGet("get-all-records")]
         public async Task<ApiResponse<GetRecordsDtos>> GetAllRecord()
         {
@@ -63,6 +64,7 @@ namespace DeviceCalibrationAndPeriodicMaintenanceSystemm.Controllers
             _apiResponse.Result = result;
             return _apiResponse;
         }
+        [AllowAnonymous]
         [HttpGet("get-id-records")]
         public async Task<ApiResponse<GetRecordsDtos>> GetIdRecords(Guid id)
         {

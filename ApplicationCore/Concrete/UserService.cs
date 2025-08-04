@@ -7,6 +7,7 @@ using AutoMapper;
 using Domain;
 using Domain.Identity;
 using Domain.Repository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
@@ -55,7 +56,7 @@ namespace ApplicationCore.Concrete
             var result = await DeleteAsync(id);
            return _automapper.Map<DeleteUserDtos>(result);
         }
-
+        [Authorize(Roles ="admin")]
         public async Task<List<GetAllUserDto>> GetAllUser()
         {
             var result = await GetAllAsync();
@@ -68,7 +69,7 @@ namespace ApplicationCore.Concrete
                 }
                 return users;
         }
-
+        [Authorize(Roles ="admin")]
         public async Task<GetByIdUserDto> GetByIdUser(Expression<Func<AppUser, bool>> filtre, params Expression<Func<AppUser, object>>[] includes)
         {
 
