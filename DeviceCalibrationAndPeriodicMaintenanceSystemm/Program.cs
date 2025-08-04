@@ -36,21 +36,7 @@ builder.Services.AddIdentity<AppUser, AppRole>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 //scopelar
-builder.Services.AddScoped<IEntityBase, EntityBase>();
-builder.Services.AddScoped(typeof(IWriteRepository<>), typeof(WriteRepository<>));
-builder.Services.AddScoped(typeof(IReadRepository<>), typeof(ReadRepository<>));
-builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-builder.Services.AddScoped(typeof(IUserService), typeof(UserService));
-builder.Services.AddScoped(typeof(IDevicesService), typeof(DeviceService));
-builder.Services.AddScoped(typeof(IMeintenancePlanService), typeof(MeintenancePlanService));
-builder.Services.AddScoped(typeof(IMeintenanceRecordService), typeof(MeintenanceRecordService));
-builder.Services.AddScoped<MailService>();
-builder.Services.AddScoped(typeof(IBaseService<>), typeof(GenericSingletionService<>));
-builder.Services.AddScoped(typeof(BeforeSaveChanges));
-builder.Services.AddScoped<IUploadImageService, UploadImageService>();
-builder.Services.AddScoped(typeof(GetClaimsBaseService));
-
-
+builder.Services.ScopeService(builder.Configuration);
 
 builder.Services.AddSwaggerCollection(builder.Configuration);
 
