@@ -60,6 +60,7 @@ namespace ApplicationCore.MappingProfile
             //Bakım kayıtları mappingleri
             CreateMap<CreateRecordsDtos, MeintenanceRecord>();
             CreateMap<MeintenanceRecord,CreateRecordsDtos>();
+            CreateMap<GetRecordsDtos, MeintenanceRecord>();
             CreateMap<UpdateRecordsDtos,MeintenanceRecord>();
             CreateMap<MeintenanceRecord, UpdateRecordsDtos>();
             CreateMap<MeintenanceRecord, DeleteRecordsDtos>();
@@ -68,7 +69,9 @@ namespace ApplicationCore.MappingProfile
             CreateMap<CreateNotificationLogDtos, NotificationLog>();
             //FeedBack mappingleri
             CreateMap<CreateFeedBackDto, FeedBack>();
+            CreateMap<FeedBack,CreateFeedBackDto>();
             CreateMap<FeedBack,UpdateFeedBackDto>();
+            CreateMap<UpdateFeedBackDto, FeedBack>();
             CreateMap<FeedBack, DeleteFeedBackDto>();
             CreateMap<FeedBack, GetFeedBackDto>();
         }

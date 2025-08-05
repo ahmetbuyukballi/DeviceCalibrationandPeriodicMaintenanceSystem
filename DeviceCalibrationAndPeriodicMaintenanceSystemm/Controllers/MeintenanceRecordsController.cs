@@ -76,5 +76,13 @@ namespace DeviceCalibrationAndPeriodicMaintenanceSystemm.Controllers
             _apiResponse.Result = result;
             return _apiResponse;
         }
+        [HttpPost("dowloand-recordsexcel")]
+        public async Task<IActionResult> GetRecordsExcel(Guid id)
+        {
+            _logger.LogInformation("Excel dosyası oluşturuluyor");
+            var stream=await _service.GetRecordsExcel(id);
+
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "BakimRaporu.xlsx");
+        }
     }
 }

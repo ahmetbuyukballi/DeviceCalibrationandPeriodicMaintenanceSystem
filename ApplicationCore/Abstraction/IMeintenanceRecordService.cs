@@ -16,5 +16,6 @@ namespace ApplicationCore.Abstraction
         public Task<DeleteRecordsDtos> DeleteRecords(Guid id);
         public Task<List<GetRecordsDtos>> GetAllRecords();
         public Task<GetRecordsDtos> GetByIdRecords(Guid id, params Expression<Func<MeintenanceRecord, object>>[] includes);
+        public Task<MemoryStream> GetRecordsExcel(Guid id);
     }
 }

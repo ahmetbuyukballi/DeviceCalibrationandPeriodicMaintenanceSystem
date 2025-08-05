@@ -38,7 +38,7 @@ namespace ApplicationCore.Concrete
                     using (var scope = _scopeFactory.CreateScope())
                     {
                         var _baseService = scope.ServiceProvider.GetRequiredService<IBaseService<AppUser>>();//ibaseservice kullanmam baseservice bir abstract class olduğu için scope olmuyor tamam mı ben de baseservice:ibaseservice yaptım sonra da bir class oluşturdum ve o classa baseservice verdim ve sonra dedim ibaseservicei çağırınca o class gelsin ve olayı çözdüm.
-                        var _mailService=scope.ServiceProvider.GetRequiredService<MailService.MailService>();
+                        var _mailService = scope.ServiceProvider.GetRequiredService<MailService.MailService>();
                         var _NotificationbaseService = scope.ServiceProvider.GetRequiredService<IBaseService<NotificationLog>>();
                         var users = await _baseService.GetAllAsync();
                         foreach (var item in users)
@@ -53,14 +53,15 @@ namespace ApplicationCore.Concrete
                                     if (!string.IsNullOrWhiteSpace(record.Email))
                                     {
                                         await _mailService.SendEmailAsync(record.Email, $"{models.name} isimli bakım planı hakkında", "Bakımınıza 5 gün kalmıştır.İyi günler dileriz");
-                                        var model = new CreateNotificationLogDtos{
-                                            Content= $"{models.name} isimli bakım planı hakkında.Bakımınıza 5 gün kalmıştır.İyi günler dileriz",
-                                            Type="Gmail",
-                                            devicesId=models.DevicesId,
-                                            MeintenanceRecordId=models.Id
+                                        var model = new CreateNotificationLogDtos
+                                        {
+                                            Content = $"{models.name} isimli bakım planı hakkında.Bakımınıza 5 gün kalmıştır.İyi günler dileriz",
+                                            Type = "Gmail",
+                                            devicesId = models.DevicesId,
+                                            MeintenanceRecordId = models.Id
                                         };
                                         var notificationLg = _mapper.Map<NotificationLog>(model);
-                                       var notResult=await _NotificationbaseService.AddAsync(notificationLg,null,null,null);
+                                        var notResult = await _NotificationbaseService.AddAsync(notificationLg, null, null, null);
                                     }
 
                                 }
@@ -73,13 +74,13 @@ namespace ApplicationCore.Concrete
                                         {
                                             Content = $"{models.name} isimli bakım planı hakkında.Bakım gününüz geçmiştir.Lütfen en kısa sürede cihazınızı bakıma getiriniz.İyi günler dileriz",
                                             Type = "Gmail",
-                                            devicesId =models.DevicesId,
-                                            MeintenanceRecordId =models.Id
+                                            devicesId = models.DevicesId,
+                                            MeintenanceRecordId = models.Id
                                         };
                                         var notificationLg = _mapper.Map<NotificationLog>(model);
                                         var notResult = await _NotificationbaseService.AddAsync(notificationLg, null, x => x.CreatedTime == DateTime.Now);
                                     }
-                                
+
                                 }
                             }
                         }

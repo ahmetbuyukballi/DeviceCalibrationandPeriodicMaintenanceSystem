@@ -38,16 +38,20 @@ namespace ApplicationCore.Concrete
             _uploadImageService = uploadImageService;
             _getClaimsBaseService = getClaimsBaseService;
         }
-        public async Task<CreateDeviceDto> CreateDevice(CreateDeviceDto device, IFormFile? file)
+        public async Task<CreateDeviceDto> CreateDevice(CreateDeviceDto device, IFormFile? file=null)
         {
-            if (file != null&&file.ContentType=="image/png"|| file.ContentType=="image/jpeg")
+            if (file != null)
             {
-                var ImageUrl=await _uploadImageService.UploadImageAsync(file);
-                var entity= _mapper.Map<Devices>(device);
-                entity.UserId = _getClaimsBaseService.GetUserId();
-                entity.ImagePath = ImageUrl;
-                var result=await AddAsync(entity, null, x => x.SerialNo == device.serialNo);
-                return _mapper.Map<CreateDeviceDto>(result);
+                if(file.ContentType == "image/png" || file.ContentType == "image/jpeg")
+                {
+                    var ImageUrl = await _uploadImageService.UploadImageAsync(file);
+                    var entity = _mapper.Map<Devices>(device);
+                    entity.UserId = _getClaimsBaseService.GetUserId();
+                    entity.ImagePath = ImageUrl;
+                    var result = await AddAsync(entity, null, x => x.SerialNo == device.serialNo);
+                    return _mapper.Map<CreateDeviceDto>(result);
+                }
+               
 
             }
                 var models = _mapper.Map<Devices>(device);

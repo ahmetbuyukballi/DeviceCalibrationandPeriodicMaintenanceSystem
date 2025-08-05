@@ -9,12 +9,13 @@ using Newtonsoft.Json.Linq;
 namespace DeviceCalibrationAndPeriodicMaintenanceSystemm.Controllers
 {
     [Authorize]
+    [Route("api/feedback")]
     public class FeedBackController : ControllerBase
     {
         private readonly IFeedBackService _feedBackService;
-        private readonly ILogger _logger;
+        private readonly ILogger<FeedBackController> _logger;
 
-        public FeedBackController(IFeedBackService feedBackService, ILogger logger)
+        public FeedBackController(IFeedBackService feedBackService, ILogger<FeedBackController> logger)
         {
             _feedBackService = feedBackService;
             _logger = logger;

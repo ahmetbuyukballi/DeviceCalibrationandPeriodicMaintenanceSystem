@@ -84,9 +84,6 @@ namespace DeviceCalibrationAndPeriodicMaintenanceSystemm.Controllers
                 _apiResponse.HttpStatusCode = System.Net.HttpStatusCode.OK;
                 _apiResponse.Result = result;
                 return _apiResponse;
-            
-
-          
         }
     }       
 }
