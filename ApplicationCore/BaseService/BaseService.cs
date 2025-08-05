@@ -56,15 +56,23 @@ namespace ApplicationCore.BaseService
             {
                 await LoadReference(method, references);
             }
-
-          if(await _readRepository.GetSingleAsync(method)==null)
+            if (method != null)
             {
-                var user=await _writeRepository.AddAsync(entity);
-                await _writeRepository.SaveAsync();
-                return entity;
-            }
 
-            throw new InvalidOperationException("Bu veri veritabanında mevcut");
+                if (await _readRepository.GetSingleAsync(method) == null)
+                {
+                    var user = await _writeRepository.AddAsync(entity);
+                    await _writeRepository.SaveAsync();
+                    return entity;
+
+                }
+                throw new InvalidOperationException("Bu veri veritabanında mevcut");
+            }
+          
+               var result=await _writeRepository.AddAsync(entity);
+               await _writeRepository.SaveAsync();
+               return entity;
+
             
         }
 

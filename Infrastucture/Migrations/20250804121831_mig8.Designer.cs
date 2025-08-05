@@ -4,6 +4,7 @@ using Infrastucture.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastucture.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250804121831_mig8")]
+    partial class mig8
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -148,11 +151,14 @@ namespace Infrastucture.Migrations
                     b.Property<Guid?>("UserId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("devicesId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("DeviceId");
-
                     b.HasIndex("UserId");
+
+                    b.HasIndex("devicesId");
 
                     b.ToTable("feedback");
                 });
@@ -521,13 +527,15 @@ namespace Infrastucture.Migrations
 
             modelBuilder.Entity("Domain.Entites.FeedBack", b =>
                 {
-                    b.HasOne("Domain.Entites.Devices", "devices")
-                        .WithMany("feedBack")
-                        .HasForeignKey("DeviceId");
-
                     b.HasOne("Domain.Identity.AppUser", "AppUsers")
                         .WithMany("FeedBacks")
                         .HasForeignKey("UserId");
+
+                    b.HasOne("Domain.Entites.Devices", "devices")
+                        .WithMany("feedBack")
+                        .HasForeignKey("devicesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("AppUsers");
 

@@ -15,7 +15,7 @@ using DeviceCalibrationAndPeriodicMaintenanceSystemm;
 using Infrastucture.Audit;
 using Org.BouncyCastle.Asn1.X509.Qualified;
 using ApplicationCore.BaseService;
-
+using OfficeOpenXml;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -64,6 +64,8 @@ builder.Services.AddScoped<MailService>();
 });*/
 builder.Services.AddAuthorization();
 
+
+
 var app = builder.Build();
 
 // Veritabaný seed iþlemi
@@ -82,6 +84,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
 app.UseStaticFiles();
 app.UseMiddleware<ExpectionMiddleware>(); // kendi middleware'in
 app.UseHttpsRedirection();

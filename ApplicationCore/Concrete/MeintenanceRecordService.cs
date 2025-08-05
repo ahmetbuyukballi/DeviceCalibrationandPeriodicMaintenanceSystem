@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -73,6 +74,46 @@ namespace ApplicationCore.Concrete
         {
            var result=await UpdateAsync(models,x=>x.Id==models.Id, includes);
            return _mapper.Map<UpdateRecordsDtos>(result);
+        }
+
+        public async Task<MemoryStream> GetRecordsExcel(Guid id)
+        {
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            var result = await GetAllAsync(x => x.UserId == id);
+            var dto = _mapper.Map<List<GetRecordsDtos>>(result);
+
+            using var package = new ExcelPackage();
+            var worksheet = package.Workbook.Worksheets.Add("Cihazın Bakım geçmişi");
+
+            worksheet.Cells[1, 1].Value = "Bakım Adı";
+            worksheet.Cells[1, 2].Value = "Bakım Açıklaması";
+            worksheet.Cells[1, 3].Value = "Bakım Rutini";
+            worksheet.Cells[1, 4].Value = "Bakım Başlangıç Günü";
+            worksheet.Cells[1, 5].Value = "Bakım Bitiş Günü";
+            worksheet.Cells[1, 6].Value = "Cihaz Adı";
+            worksheet.Cells[1, 7].Value = "Kullanıcı Adı";
+
+
+            foreach (var entity in result)
+            {
+                var device = entity.devices;
+                var userName = entity.appUser.UserName;
+                for (int i = 0; i < result.Count; i++)
+                {
+                    worksheet.Cells[i + 2, 1].Value = entity.name;
+                    worksheet.Cells[i + 2, 2].Value = entity.Description;
+                    worksheet.Cells[i + 2, 3].Value = entity.Intervaldays;
+                    worksheet.Cells[i + 2, 4].Value = entity.StartMeintenceDay;
+                    worksheet.Cells[i + 2, 5].Value = entity.LastMaintenceDay;
+                    worksheet.Cells[i + 2, 6].Value = device.Name;
+                    worksheet.Cells[i + 2, 7].Value = userName;
+                }
+            }
+            var stream = new MemoryStream();
+            package.SaveAs(stream);
+            stream.Position = 0;
+
+            return stream;
         }
     }
 }
