@@ -54,10 +54,10 @@ namespace DeviceCalibrationAndPeriodicMaintenanceSystemm.Controllers
         }
         [AllowAnonymous]
         [HttpGet("get-all-records")]
-        public async Task<ApiResponse<GetRecordsDtos>> GetAllRecord()
+        public async Task<ApiResponse<List<GetRecordsDtos>>> GetAllRecord()
         {
             _logger.LogInformation("Kayıt listeleme işlemi başlatılıyor");
-            var _apiResponse = new ApiResponse<GetRecordsDtos>();
+            var _apiResponse = new ApiResponse<List<GetRecordsDtos>>();
             var result = await _service.GetAllRecords();
             _apiResponse.IsSuccess = true;
             _apiResponse.HttpStatusCode = System.Net.HttpStatusCode.OK;

@@ -16,6 +16,7 @@ using Infrastucture.Audit;
 using Org.BouncyCastle.Asn1.X509.Qualified;
 using ApplicationCore.BaseService;
 using OfficeOpenXml;
+using StackExchange.Redis;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -57,6 +58,11 @@ builder.Services.Configure<RouteOptions>(options => {
 });
 builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SmtpSettings"));
 builder.Services.AddScoped<MailService>();
+builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+{
+    var configuration = "localhost";
+    return ConnectionMultiplexer.Connect(configuration);
+});
 /*builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("Admin rolü ara",

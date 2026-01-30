@@ -47,9 +47,9 @@ namespace DeviceCalibrationAndPeriodicMaintenanceSystemm.Controllers
                 return _apiResponse;
         }
         [HttpGet("get-device")]
-        public async Task<ApiResponse<GetDeviceDto>> GetDevice()
+        public async Task<ApiResponse<List<GetDeviceDto>>> GetDevice()
         {
-            var _apiResponse = new ApiResponse<GetDeviceDto>();
+            var _apiResponse = new ApiResponse<List<GetDeviceDto>>();
             _logger.LogInformation("Cihazlar listeleniyor");
             var result = await _deviceService.GetAllDevice();
 

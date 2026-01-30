@@ -23,7 +23,7 @@ namespace ApplicationCore.Responses
         }
 
         public bool IsSuccess { get; set; }
-        public object Result { get; set; }
+        public T Result { get; set; }
         public List<string> ErrorMessages { get; set; }
         public HttpStatusCode HttpStatusCode { get; set; }
     }

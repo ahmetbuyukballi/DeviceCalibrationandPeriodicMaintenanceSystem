@@ -10,7 +10,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Storage.Json;
+using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,8 +32,9 @@ namespace ApplicationCore.BaseService
         private readonly IReadRepository<TModel> _readRepository;
         private readonly UserManager<AppUser> _userManager;
         private readonly IHttpContextAccessor _httpcontextAccessor;
+        //private readonly StackExchange.Redis.IDatabase _dataBase;
 
-        public BaseService(IWriteRepository<TModel> writeRepository,IMapper mapper,IRepository<TModel> repository,IReadRepository<TModel> readRepository,UserManager<AppUser> userManager,IHttpContextAccessor httpContextAccessor) 
+        public BaseService(/*IConnectionMultiplexer connectionMultiplexer,StackExchange.Redis.IDatabase database,*/IWriteRepository<TModel> writeRepository,IMapper mapper,IRepository<TModel> repository,IReadRepository<TModel> readRepository,UserManager<AppUser> userManager,IHttpContextAccessor httpContextAccessor) 
         { 
             _writeRepository = writeRepository;
             _autpMapper = mapper;
@@ -39,6 +42,7 @@ namespace ApplicationCore.BaseService
             _readRepository = readRepository;
             _userManager = userManager;
             _httpcontextAccessor = httpContextAccessor;
+            //_dataBase = database;
         }
 
    
@@ -63,6 +67,8 @@ namespace ApplicationCore.BaseService
                 {
                     var user = await _writeRepository.AddAsync(entity);
                     await _writeRepository.SaveAsync();
+                    //var key=$"user:{model.}"
+
                     return entity;
 
                 }
@@ -90,7 +96,7 @@ namespace ApplicationCore.BaseService
 
         public virtual async Task<List<TModel>> GetAllAsync(Expression<Func<TModel, bool>>? filter = null, params Expression<Func<TModel, object>>[] includes)
         {
-            IQueryable<TModel> query = _readRepository.GetAll();
+            IQueryable<TModel> query = _readRepository.GetAll().AsNoTracking();
             if (query!=null)
             {
                 query = ApplyIncludes(query, includes);
@@ -107,7 +113,7 @@ namespace ApplicationCore.BaseService
 
         public virtual async Task<TModel> GetByIdAsync(Expression<Func<TModel, bool>> filter, params Expression<Func<TModel, object>>[] includes)
         {
-            IQueryable<TModel> query = _readRepository.GetAll();
+            IQueryable<TModel> query = _readRepository.GetAll().AsNoTracking();
             query=ApplyIncludes(query, includes);
             var entity =  await query.FirstOrDefaultAsync(filter);
             if (entity != null)
