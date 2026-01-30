@@ -60,10 +60,10 @@ namespace DeviceCalibrationAndPeriodicMaintenanceSystemm.Controllers
         }
         [AllowAnonymous]
         [HttpGet("get-plan")]
-        public async Task<ApiResponse<GetMeintenancePlanDtos>> GetAllPlan()
+        public async Task<ApiResponse<List<GetMeintenancePlanDtos>>> GetAllPlan()
         {
             _logger.LogInformation("Listeleme işlemi başlıyor");
-            var _apiResponse = new ApiResponse<GetMeintenancePlanDtos>();
+            var _apiResponse = new ApiResponse<List<GetMeintenancePlanDtos>>();
             var result = await _planService.GetAllPlan();
        
             _apiResponse.IsSuccess = true;

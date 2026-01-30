@@ -9,7 +9,7 @@ namespace DeviceCalibrationAndPeriodicMaintenanceSystemm
     {
         public static IServiceCollection AddSwaggerCollection(this IServiceCollection services, IConfiguration configuration)
         {
-
+            // JWT Authentication Configuration
             var key = configuration.GetValue<string>("SecretKey:jwtKey");
             services.AddAuthentication(u =>
             {

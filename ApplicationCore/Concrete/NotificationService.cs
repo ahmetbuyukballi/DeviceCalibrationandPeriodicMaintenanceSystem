@@ -20,7 +20,7 @@ namespace ApplicationCore.Concrete
 {
     public class NotificationService : BackgroundService
     {
-        private readonly TimeOnly _runTime = new(10,25);
+        private readonly TimeOnly _runTime = new(15,03);
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IMapper _mapper;
         public NotificationService(IServiceScopeFactory serviceScopeFactory,IMapper mapper)

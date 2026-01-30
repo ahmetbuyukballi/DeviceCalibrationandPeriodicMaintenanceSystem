@@ -90,8 +90,7 @@ namespace ApplicationCore.Concrete
         public async Task<GetDeviceDto> GetByIdDevice(Guid id, params Expression<Func<Devices, object>>[] includes)
         {
             var result = await GetByIdAsync(x=>x.Id==id);
-
-              return _mapper.Map<GetDeviceDto>(result);
+            return _mapper.Map<GetDeviceDto>(result);
 
           
         }

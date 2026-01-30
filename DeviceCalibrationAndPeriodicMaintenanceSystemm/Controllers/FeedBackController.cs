@@ -48,10 +48,10 @@ namespace DeviceCalibrationAndPeriodicMaintenanceSystemm.Controllers
         }
 
         [HttpGet("getall-feedback")]
-        public async Task<ApiResponse<GetFeedBackDto>> GetAllFeedBack()
+        public async Task<ApiResponse<List<GetFeedBackDto>>> GetAllFeedBack()
         {
             _logger.LogInformation("Listeleme işlemi başlıyor");
-            var _apiResponse=new ApiResponse<GetFeedBackDto>();
+            var _apiResponse=new ApiResponse<List<GetFeedBackDto>>();
 
             var result=await _feedBackService.GetAllFeedBack(); 
             _apiResponse.IsSuccess=true;

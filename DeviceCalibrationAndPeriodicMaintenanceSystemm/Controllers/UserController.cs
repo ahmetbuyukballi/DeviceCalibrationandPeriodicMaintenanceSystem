@@ -88,9 +88,9 @@ namespace DeviceCalibrationAndPeriodicMaintenanceSystemm.Controllers
         }
        [Authorize(Roles ="admin")]
         [HttpGet("getall-user")]
-        public async Task<ApiResponse<GetAllUserDto>> GetAll()
+        public async Task<ApiResponse<List<GetAllUserDto>>> GetAll()
         {
-            var _apiResponse=new ApiResponse<GetAllUserDto>();
+            var _apiResponse=new ApiResponse<List<GetAllUserDto>>();
             _logger.LogInformation("GetAll işlemi başlatıldı");
             var result = await _userService.GetAllUser();
             if (result!=null)
@@ -127,9 +127,9 @@ namespace DeviceCalibrationAndPeriodicMaintenanceSystemm.Controllers
 
         }
         [HttpPost("refresh-token")]
-        public async Task<ApiResponse<LoginResponseModels>> RefreshToken([FromBody] RefreshTokenRequestDtos models)
+        public async Task<ApiResponse<RefreshTokenResponseDtos>> RefreshToken([FromBody] RefreshTokenRequestDtos models)
         {
-            var _apiResponse=new ApiResponse<LoginResponseModels>();
+            var _apiResponse=new ApiResponse<RefreshTokenResponseDtos>();
             var result=await _userService.RefreshTokenAsync(models);
             _apiResponse.IsSuccess= true;
             _apiResponse.HttpStatusCode=HttpStatusCode.OK;
