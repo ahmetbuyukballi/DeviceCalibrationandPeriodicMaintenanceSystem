@@ -1,11 +1,9 @@
-# app
-Cihaz Kalibrasyon ve Periyodik Bakım Sistemi
+# Cihaz Kalibrasyon ve Periyodik Bakım Sistemi
 
 Bu proje, cihazların kalibrasyon ve periyodik bakım süreçlerini yönetmek için geliştirilmiş, katmanlı mimariye sahip bir .NET 8 ASP.NET Core Web API uygulamasıdır. 
 Sistem; cihaz yönetimi, bakım planlama, bakım kayıtları, geri bildirim ve bildirim süreçlerini merkezi olarak yönetmeyi amaçlar.
 
-# app
-Proje katmanlı mimari (layered architecture) prensibine göre tasarlanmıştır
+# Proje katmanlı mimari (layered architecture) prensibine göre tasarlanmıştır
 Domain
  ├── Entity sınıfları
  └── Temel domain modelleri
@@ -26,8 +24,7 @@ Web API
  ├── Swagger yapılandırması
  └── API başlangıç ayarları
 
-# app
- Özellikler
+#  Özellikler
 
  Cihaz yönetimi (CRUD işlemleri)
 
